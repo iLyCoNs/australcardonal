@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1784789943473,
+  "updatedAt": 1784789969734,
   "lotes": [
     {
       "tipo": "lote-libre",
@@ -46,7 +46,7 @@
         "#DesarrolloComercial",
         "#TerrenoAmplio"
       ],
-      "caracteristicas": "#PotencialInmobiliario  #PlusvaliaGarantizada  #InversionInmobiliaria  #DesarrolloUrbano #Topografia  #ObrasCiviles  #ProyectosHabitacionales  #DesarrolloComercial  #TerrenoAmplio"
+      "caracteristicas": "#PotencialInmobiliario, #PlusvaliaGarantizada, #InversionInmobiliaria, #DesarrolloUrbano, #Topografia, #ObrasCiviles, #ProyectosHabitacionales, #DesarrolloComercial, #TerrenoAmplio"
     }
   ],
   "geo": {
