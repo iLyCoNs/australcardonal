@@ -1,0 +1,12 @@
+{
+  "name": "kpk-v1-basic",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "obfuscate": "node obfuscate-basic.mjs",
+    "restore-clear": "node restore-clear.mjs"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^4.1.1"
+  }
+}

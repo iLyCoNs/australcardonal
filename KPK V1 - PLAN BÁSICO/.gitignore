@@ -1,0 +1,30 @@
+# ── Entorno ────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Configuración con API Keys (NUNCA subir al repo) ────────
+config.local.js
+
+# ── Dependencias ────────────────────────────────────────────
+node_modules/
+
+# ── Archivos del sistema operativo ──────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editores ─────────────────────────────────────────────────
+.vscode/settings.json
+*.suo
+*.user
+
+# ── Scratch y Pruebas ───────────────────────────────────────
+scratch/
+tmp-*.mp3
+tmp-*.wav
+tools/out/
+
+# ── Plantillas Locales (NUNCA subir a GitHub sin permiso) ───
+VERSION LIMPIA/
+

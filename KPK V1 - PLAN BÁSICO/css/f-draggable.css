@@ -1,0 +1,58 @@
+/**
+ * f-draggable.css — Affordance de arrastre + overrides de posición libre
+ */
+
+.kpk-drag-handle {
+  cursor: grab !important;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.kpk-is-draggable.is-dragging,
+.kpk-is-draggable.is-dragging .kpk-drag-handle {
+  cursor: grabbing !important;
+}
+
+body.kpk-widget-dragging {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+body.kpk-widget-dragging iframe {
+  pointer-events: none !important;
+}
+
+/* Tras arrastrar: anclar a left/top y anular layouts CSS (right/bottom/transform) */
+.kpk-is-draggable.is-user-positioned,
+.kpk-is-draggable.is-user-positioned.is-open,
+body.kpk-tourism-open .kpk-map-widget.is-open.is-user-positioned,
+body.kpk-ai-panel-open .kpk-is-draggable.is-user-positioned {
+  position: fixed !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.kpk-is-draggable.is-dragging {
+  transition: none !important;
+  will-change: left, top;
+}
+
+/* Handles conocidos — refuerzo visual sutil */
+.kpk-tw-header.kpk-drag-handle,
+.kpk-widget-header.kpk-drag-handle,
+.kpk-cal__handle.kpk-drag-handle,
+.kpk-fw-header.kpk-drag-handle,
+.kpk-ai-header.kpk-drag-handle,
+.kpk-lote-header.kpk-drag-handle,
+.kpk-spectator-header.kpk-drag-handle,
+.kpk-panel-header.kpk-drag-handle,
+.kpk-mbp-header.kpk-drag-handle,
+.kpk-fin__handle.kpk-drag-handle,
+#kpk-weather-handle.kpk-drag-handle {
+  cursor: grab;
+}
