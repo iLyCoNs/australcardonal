@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1784781680844,
+  "updatedAt": 1784781692232,
   "lotes": [
     {
       "tipo": "lote-libre",
@@ -23,7 +23,7 @@
         ]
       ],
       "estado": "disponible",
-      "titulo": "Lote 1",
+      "titulo": "01",
       "createdAt": 1784781316063,
       "id": "7aa12008-36c6-4aae-b774-9b1673dc7ff8",
       "_pinCentroid": [
