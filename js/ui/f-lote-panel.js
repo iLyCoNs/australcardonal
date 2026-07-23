@@ -127,14 +127,16 @@
         tagsContainer.innerHTML = '';
         const rawContent = line.hashtags ? (Array.isArray(line.hashtags) ? line.hashtags.join(' ') : line.hashtags) : (line.caracteristicas || '');
         if (rawContent && rawContent.trim()) {
-          const tags = rawContent.split(/[,.;\s]+/).map(t => t.trim()).filter(Boolean);
+          const tags = rawContent
+            .split(/[\s,;.]+|(?=#)/)
+            .map(t => t.replace(/^#+/, '').trim())
+            .filter(Boolean);
+
           if (tags.length) {
-            tags.forEach(tag => {
-              const cleanTag = tag.startsWith('#') ? tag.slice(1) : tag;
-              if (!cleanTag) return;
+            tags.forEach(cleanTag => {
               const span = document.createElement('span');
               span.className = 'kpk-spec-tag';
-              span.innerHTML = `<span>#</span>${cleanTag}`;
+              span.innerHTML = `<span class="kpk-spec-tag-hash">#</span><span class="kpk-spec-tag-text">${cleanTag}</span>`;
               tagsContainer.appendChild(span);
             });
             tagsContainer.style.display = 'flex';
@@ -202,7 +204,7 @@
 
     const rawHashVal = _inHashtags ? _inHashtags.value.trim() : '';
     const parsedHashtags = rawHashVal
-      ? rawHashVal.split(/[,;\s]+/).map(t => t.trim()).filter(Boolean).map(t => t.startsWith('#') ? t : `#${t}`)
+      ? rawHashVal.split(/[\s,;.]+|(?=#)/).map(t => t.replace(/^#+/, '').trim()).filter(Boolean).map(t => `#${t}`)
       : [];
 
     const updates = {
