@@ -1,1 +1,48 @@
-[]
+[
+  {
+    "tipo": "lote-libre",
+    "puntos": [
+      [
+        -69.05337448691384,
+        28.352316206763632
+      ],
+      [
+        -69.90091440315453,
+        -22.795432183523623
+      ],
+      [
+        -71.28467269161345,
+        -152.96146267990594
+      ],
+      [
+        -71.26048860869467,
+        150.9342184285938
+      ]
+    ],
+    "estado": "disponible",
+    "titulo": "01",
+    "createdAt": 1784789289867,
+    "id": "5e7df7f8-90f2-48e3-9828-857db51e83fe",
+    "_pinCentroid": [
+      -88.783872108192,
+      35.8563849214406
+    ],
+    "hasSmartPin": true,
+    "pinPosition": null,
+    "pinPos": null,
+    "dimensiones": "5000",
+    "valorUF": 12500,
+    "hashtags": [
+      "#PotencialInmobiliario",
+      "#PlusvaliaGarantizada",
+      "#InversionInmobiliaria",
+      "#DesarrolloUrbano",
+      "#Topografia",
+      "#ObrasCiviles",
+      "#ProyectosHabitacionales",
+      "#DesarrolloComercial",
+      "#TerrenoAmplio"
+    ],
+    "caracteristicas": "#PotencialInmobiliario  #PlusvaliaGarantizada  #InversionInmobiliaria  #DesarrolloUrbano #Topografia  #ObrasCiviles  #ProyectosHabitacionales  #DesarrolloComercial  #TerrenoAmplio"
+  }
+]
