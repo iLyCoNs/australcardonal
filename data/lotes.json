@@ -26,6 +26,11 @@
     "_pinCentroid": [
       -88.76457203632627,
       32.44647403507225
-    ]
+    ],
+    "hasSmartPin": true,
+    "pinPosition": null,
+    "pinPos": null,
+    "dimensiones": "5000",
+    "valorUF": 12500
   }
 ]
