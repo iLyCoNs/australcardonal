@@ -1522,6 +1522,58 @@ body.kpk-lote-fill-hover-only .lote-interactivo:hover .path-default {
   margin: 2px 0;
 }
 
+/* ── HASHTAGS Y ETIQUETAS DESTACADAS EN MODO ESPECTADOR ── */
+.kpk-spec-tags-container {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 10px 0 2px 0 !important;
+  margin-top: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.kpk-spec-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(0, 180, 255, 0.14), rgba(0, 120, 255, 0.08));
+  border: 1px solid rgba(0, 180, 255, 0.32);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: 'Outfit', -apple-system, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+  user-select: none;
+}
+
+.kpk-spec-tag:hover {
+  background: linear-gradient(135deg, rgba(0, 180, 255, 0.28), rgba(0, 120, 255, 0.20));
+  border-color: rgba(0, 180, 255, 0.6);
+  transform: translateY(-1.5px) scale(1.02);
+  box-shadow: 0 4px 14px rgba(0, 180, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.kpk-spec-tag-hash {
+  color: #00B4FF;
+  font-weight: 800;
+  font-size: 11.5px;
+  text-shadow: 0 0 6px rgba(0, 180, 255, 0.6);
+}
+
+.kpk-spec-tag-text {
+  color: rgba(255, 255, 255, 0.94);
+  line-height: 1.25;
+}
+
 .kpk-spectator-footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
