@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1784783277510,
+  "updatedAt": 1784783388250,
   "lotes": [
     {
       "tipo": "lote-libre",
@@ -30,9 +30,11 @@
         -88.76457203632627,
         32.44647403507225
       ],
-      "hasSmartPin": true,
+      "hasSmartPin": false,
       "dimensiones": "5000",
-      "valorUF": 12500
+      "valorUF": 12500,
+      "pinPosition": null,
+      "pinPos": null
     }
   ],
   "geo": {
