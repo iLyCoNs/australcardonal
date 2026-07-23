@@ -1,0 +1,21 @@
+{
+  "plan": "basic",
+  "version": "1.0",
+  "label": "KPK V1 — Plan Básico",
+  "features": {
+    "copilot": false,
+    "voice": false,
+    "tourism": false,
+    "weather": false,
+    "calendar": false,
+    "finance": false,
+    "nearby": false,
+    "mapTab": false,
+    "gallery": true,
+    "pdf": true,
+    "cta360": true,
+    "buyerDockLotes": true,
+    "drawingTools": false,
+    "draggableWidgets": false
+  }
+}
