@@ -1,12 +1,9 @@
 {
-  "version": 3,
-  "projectName": "Terreno Urbano de 5.000 m² en Sector de Cardonal",
+  "version": 2,
+  "projectName": "PROYECTO ALERCE PATAGÓN 360°",
   "logoPath": null,
   "logoId": null,
   "logos": [],
-  "titleBannerPath": "assets/brand/banners/title_mrx106an.png",
-  "titleBannerHref": null,
-  "titleBannerScale": 200,
   "font": "montserrat",
   "dockStyle": "graphite",
   "mobileSolid": true,
@@ -26,5 +23,5 @@
     "waAlertsPhone": "",
     "waAlertsKey": ""
   },
-  "updatedAt": 1784781804767
+  "updatedAt": 1784634358697
 }
