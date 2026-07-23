@@ -9,36 +9,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@500;600;700&family=Josefin+Sans:wght@400;500;600&family=Montserrat:wght@500;600;700&family=Outfit:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="pannellum.css?v=7">
-  <link rel="stylesheet" href="css/ferrari.css?v=obf1">
+  <link rel="stylesheet" href="css/ferrari.css?v=46">
   <!-- Pills dock/CTA glass (vence a ferrari). Clásico: css/kbd-buttons-classic.css al final. -->
   <link rel="stylesheet" href="css/kbd-buttons-glass.css?v=3">
   <link rel="stylesheet" href="css/f-gallery.css?v=1">
   <link rel="stylesheet" href="css/f-geo.css?v=21">
   <link rel="stylesheet" href="css/f-tourism.css?v=10">
+
   <!-- Widget Meteorológico -->
   <link rel="stylesheet" href="css/f-weather.css?v=6">
   <link rel="stylesheet" href="css/f-calendar.css?v=6">
   <link rel="stylesheet" href="css/f-draggable.css?v=2">
   <!-- Configuración predeterminada (API keys obfuscadas) — en el repositorio -->
-  <script src="config.js?v=obf1"></script>
+  <script src="config.js?v=7"></script>
   <!-- Configuración local (API keys de desarrollo) — gitignoreado -->
   <script src="config.local.js" onerror="window.KPK_CONFIG=window.KPK_CONFIG||null"></script>
-  <!-- Limpiador de keys obsoletas: corre DESPUÉS de que la configuración cargó -->
   <script>
     (function() {
       var cfg = window.KPK_CONFIG;
       if (!cfg) return;
       var currentVer = String(cfg.configVersion || '1');
-      var storedVer  = localStorage.getItem('kpk_config_version') || '0';
-      if (storedVer !== currentVer) {
-        ['ferrari_ai_provider', 'ferrari_ai_key_openrouter',
-         'ferrari_ai_key_groq', 'ferrari_ai_key_gemini',
-         'ferrari_gemini_api_key'].forEach(function(k) {
-          localStorage.removeItem(k);
-        });
-        localStorage.setItem('kpk_config_version', currentVer);
-        console.log('[KPK] Config v' + currentVer + ' cargada — keys AI sincronizadas.');
-      }
+      localStorage.setItem('kpk_config_version', currentVer);
     })();
   </script>
 
@@ -410,14 +401,14 @@
         <input type="number" id="lote-input-uf" placeholder="Ej: 1500" autocomplete="off">
       </div>
       
-      <!-- Conversión a CLP en tiempo real -->
-      <div style="font-size:12px; color:var(--f-text-muted); text-align:right; padding-right:4px; margin-bottom:8px;">
-        Valor CLP: <strong id="lote-clp-preview">$0</strong>
-      </div>
-
       <div class="kpk-lote-field">
-        <label>Características / Hashtags</label>
-        <textarea id="lote-input-caracteristicas" placeholder="Ej: #Plano #VistaDespejada #AguaPortatil o: Terreno plano, Luz, Agua" rows="2" style="width:100%; padding:8px 10px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; font-family:inherit; font-size:13px; resize:vertical; outline:none; box-sizing:border-box;"></textarea>
+        <label>Hashtags / Características (#Etiquetas)</label>
+        <input type="text" id="lote-input-hashtags" placeholder="Ej: #VistaAlMar, #Plano, #ArbolesNativos" autocomplete="off">
+      </div>
+      
+      <!-- Conversión a CLP en tiempo real -->
+      <div style="font-size:12px; color:var(--f-text-muted); text-align:right; padding-right:4px;">
+        Valor CLP: <strong id="lote-clp-preview">$0</strong>
       </div>
 
       <div class="kpk-lote-actions">
@@ -534,63 +525,65 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <!-- Modo: viewer/editor (debe ir primero) -->
-  <script src="js/core/f-mode.js?v=obf1"></script>
+  <script src="js/core/f-mode.js?v=1"></script>
 
   <!-- Motor Pannellum (original, intocado) -->
-  <script src="pannellum.js?v=obf1"></script>
+  <script src="pannellum.js?v=8"></script>
 
   <!-- Ferrari Core: State → DOMCache → Camera → RAF → Init -->
-  <script src="js/core/f-math-scale.js?v=obf1"></script>
-  <script src="js/core/f-state.js?v=obf1"></script>
-  <script src="js/tools/f-amenities-catalog.js?v=obf1"></script>
-  <script src="js/core/f-geo.js?v=obf1"></script>
-  <script src="js/core/f-places.js?v=obf1"></script>
-  <script src="js/core/f-dom-cache.js?v=obf1"></script>
-  <script src="js/core/f-camera.js?v=obf1"></script>
-  <script src="js/core/f-raf-loop.js?v=obf1"></script>
-  <script src="js/core/f-idle-cam.js?v=obf1"></script>
+  <script src="js/core/f-math-scale.js?v=12"></script>
+  <script src="js/core/f-state.js?v=12"></script>
+  <script src="js/tools/f-amenities-catalog.js?v=1"></script>
+  <script src="js/core/f-geo.js?v=23"></script>
+  <script src="js/core/f-places.js?v=13"></script>
+  <script src="js/core/f-dom-cache.js?v=12"></script>
+  <script src="js/core/f-camera.js?v=17"></script>
+  <script src="js/core/f-raf-loop.js?v=17"></script>
+  <script src="js/core/f-idle-cam.js?v=3"></script>
 
   <!-- Ferrari Render: sync → paths → overlay -->
-  <script src="js/render/f-svg-sync.js?v=obf1"></script>
-  <script src="js/render/f-svg-paths.js?v=obf1"></script>
-  <script src="js/render/f-smart-pins.js?v=obf1"></script>
-  <script src="js/render/f-overlay.js?v=obf1"></script>
-  <script src="js/render/f-geo-pins.js?v=obf1"></script>
+  <script src="js/render/f-svg-sync.js?v=13"></script>
+  <script src="js/render/f-svg-paths.js?v=27"></script>
+  <script src="js/render/f-smart-pins.js?v=1"></script>
+  <script src="js/render/f-overlay.js?v=13"></script>
+  <script src="js/render/f-geo-pins.js?v=30"></script>
 
   <!-- Ferrari UI -->
-  <script src="js/ui/f-draggable.js?v=obf1"></script>
-  <script src="js/ui/f-panel.js?v=obf1"></script>
-  <script src="js/ui/f-hud.js?v=obf1"></script>
-  <script src="js/tools/f-street-network.js?v=obf1"></script>
-  <script src="js/ui/f-persist.js?v=obf1"></script>
-  <script src="js/ui/f-brand-dock.js?v=obf1"></script>
-  <script src="js/ui/f-buyer-dock.js?v=obf1"></script>
-  <script src="js/ui/f-lote-panel.js?v=obf1"></script>
-  <script src="js/ui/f-gallery.js?v=obf1"></script>
-  <script src="js/ui/f-compass.js?v=obf1"></script>
-  <script src="js/ui/f-geo-editor.js?v=obf1"></script>
-  <script src="js/ui/f-tourism.js?v=obf1"></script>
+  <script src="js/ui/f-draggable.js?v=1"></script>
+  <script src="js/ui/f-panel.js?v=18"></script>
+  <script src="js/ui/f-hud.js?v=15"></script>
+  <script src="js/tools/f-street-network.js?v=15"></script>
+  <script src="js/ui/f-persist.js?v=15"></script>
+  <script src="js/ui/f-brand-dock.js?v=9"></script>
+  <script src="js/ui/f-buyer-dock.js?v=13"></script>
+  <script src="js/ui/f-lote-panel.js?v=16"></script>
+  <script src="js/ui/f-gallery.js?v=12"></script>
+  <script src="js/ui/f-compass.js?v=18"></script>
+  <script src="js/ui/f-geo-editor.js?v=24"></script>
+  <script src="js/ui/f-tourism.js?v=15"></script>
 
   <!-- Ferrari Tools -->
-  <script src="js/tools/f-draw-lote.js?v=obf1"></script>
-  <script src="js/tools/f-draw-calle.js?v=obf1"></script>
-  <script src="js/tools/f-draw-hilera.js?v=obf1"></script>
-  <script src="js/tools/f-eraser.js?v=obf1"></script>
-  <script src="js/tools/f-edit.js?v=obf1"></script>
-  <script src="js/tools/f-add-pin.js?v=obf1"></script>
-  <script src="js/tools/f-geo-tools.js?v=obf1"></script>
-  <script src="js/tools/f-kmz-calco.js?v=obf1"></script>
-  <script src="js/tools/f-amenities.js?v=obf1"></script>
-  <script src="js/tools/f-tone.js?v=obf1"></script>
+  <script src="js/tools/f-draw-lote.js?v=13"></script>
+  <script src="js/tools/f-draw-calle.js?v=16"></script>
+  <script src="js/tools/f-draw-hilera.js?v=12"></script>
+  <script src="js/tools/f-eraser.js?v=12"></script>
+  <script src="js/tools/f-edit.js?v=18"></script>
+  <script src="js/tools/f-add-pin.js?v=12"></script>
+  <script src="js/tools/f-geo-tools.js?v=16"></script>
+  <script src="js/tools/f-kmz-calco.js?v=2"></script>
+  <script src="js/tools/f-amenities.js?v=1"></script>
+  <script src="js/tools/f-tone.js?v=1"></script>
 
   <!-- Ferrari Device: detección de capacidad (debe ir antes de f-init) -->
-  <script src="js/core/f-device.js?v=obf1"></script>
+  <script src="js/core/f-device.js?v=8"></script>
+
+
 
   <!-- Widget Meteorológico (Open-Meteo · sin API key) -->
-  <script src="js/ui/f-weather.js?v=obf1"></script>
+  <script src="js/ui/f-weather.js?v=7"></script>
 
   <!-- Ferrari Init: último, arranca todo -->
-  <script src="js/core/f-init.js?v=obf1"></script>
+  <script src="js/core/f-init.js?v=27"></script>
 
 </body>
 </html>

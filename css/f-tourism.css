@@ -1,0 +1,418 @@
+/**
+ * f-tourism.css — Jarvis Turismo · glass clima + layout inteligente desktop/móvil
+ *
+ * Desktop: izquierda (chat JARVIS vive a la derecha).
+ * Móvil: sheet inferior compacto, media acotada, texto siempre legible.
+ */
+
+.kpk-tourism-widget {
+  position: fixed;
+  /* Desktop: izquierda — no pelear con el chat (derecha) */
+  left: 18px;
+  right: auto;
+  bottom: 20px;
+  z-index: 10003;
+
+  width: min(348px, calc(100vw - 420px));
+  max-width: 360px;
+  height: auto;
+  max-height: min(70vh, 540px);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.12) inset;
+  font-family: 'Outfit', -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease, left 0.25s ease, bottom 0.25s ease, width 0.25s ease;
+}
+
+.kpk-tourism-widget.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Pantallas anchas: un poco más de aire */
+@media (min-width: 1280px) {
+  .kpk-tourism-widget {
+    left: 24px;
+    width: 360px;
+    max-height: min(68vh, 560px);
+  }
+}
+
+/* Si el chat está cerrado (panel no .is-open), turismo puede crecer un poco */
+body:not(.kpk-ai-panel-open) .kpk-tourism-widget {
+  width: min(360px, calc(100vw - 48px));
+}
+
+.kpk-tw-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 13px 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  flex-shrink: 0;
+}
+
+.kpk-tw-eyebrow {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(125, 211, 252, 0.95);
+}
+
+.kpk-tw-eyebrow .kpk-tw-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  background: rgba(255, 59, 48, 0.85);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.35);
+}
+
+.kpk-tw-title {
+  display: block;
+  margin-top: 2px;
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.kpk-tw-close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.kpk-tw-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* ─── Media: más alto (espacio liberado al quitar CTA de lote) ─────────────── */
+.kpk-tw-media {
+  position: relative;
+  flex: 0 0 auto;
+  max-height: 220px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.28);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.kpk-tw-media-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 7px 10px 0;
+  flex-shrink: 0;
+}
+
+.kpk-tw-tab {
+  flex: 1;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 650;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.kpk-tw-tab:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.kpk-tw-tab.is-active {
+  background: rgba(0, 180, 255, 0.88);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0, 180, 255, 0.32);
+}
+
+.kpk-tw-media-stage {
+  position: relative;
+  width: 100%;
+  height: 178px;
+  overflow: hidden;
+}
+
+.kpk-tw-panel {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+.kpk-tw-panel.is-active {
+  display: block;
+}
+
+.kpk-tw-video {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding-bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+.kpk-tw-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.kpk-tw-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.kpk-tw-map-hint {
+  padding: 20px 14px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(245, 245, 247, 0.75);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+/* Cuerpo: siempre espacio legible + scroll */
+.kpk-tw-body {
+  padding: 10px 13px 6px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 64px;
+  max-height: 120px;
+  -webkit-overflow-scrolling: touch;
+}
+.kpk-tw-body::-webkit-scrollbar { width: 3px; }
+.kpk-tw-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.kpk-tw-blurb {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: rgba(245, 245, 247, 0.92);
+  white-space: pre-line;
+}
+
+.kpk-tw-meta {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(125, 211, 252, 0.95);
+}
+
+.kpk-tw-meta-link {
+  color: rgba(125, 211, 252, 0.98);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+}
+
+.kpk-tw-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 11px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.kpk-tw-btn {
+  flex: 1 1 auto;
+  min-width: 88px;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 11px;
+  padding: 7px 9px;
+  font-size: 11px;
+  font-weight: 650;
+  font-family: inherit;
+  color: #fff;
+  transition: filter 0.15s ease;
+}
+.kpk-tw-btn:hover { filter: brightness(1.08); }
+
+.kpk-tw-btn--route {
+  flex: 1 1 100%;
+  background: linear-gradient(135deg, rgba(0, 180, 255, 0.95), rgba(0, 120, 255, 0.9));
+  box-shadow: 0 6px 18px rgba(0, 120, 255, 0.28);
+}
+.kpk-tw-btn--maps { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.14); }
+.kpk-tw-btn--waze { background: #33ccff; color: #0b1b24; }
+.kpk-tw-btn--look { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.14); }
+.kpk-tw-btn--next {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.kpk-tw-btn--lot {
+  flex: 1 1 100%;
+  background: linear-gradient(135deg, rgba(57, 255, 20, 0.22), rgba(0, 180, 255, 0.18));
+  border: 1px solid rgba(57, 255, 20, 0.35);
+  color: #e8ffe8;
+}
+.kpk-tw-btn--wa {
+  flex: 1 1 100%;
+  background: #25d366;
+  color: #062814;
+}
+
+.kpk-tw-related {
+  padding: 7px 11px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  max-height: 78px;
+  overflow: hidden;
+}
+.kpk-tw-related-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 5px;
+}
+.kpk-tw-related-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.kpk-tw-mini {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5f5f7;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.kpk-tw-mini:hover {
+  background: rgba(0, 180, 255, 0.2);
+  border-color: rgba(0, 180, 255, 0.4);
+}
+
+/* Mapa: cuando turismo está abierto, anclar arriba-izquierda (sobre el turismo) */
+body.kpk-tourism-open .kpk-map-widget.is-open {
+  left: 18px !important;
+  right: auto !important;
+  top: 72px !important;
+  width: min(360px, calc(100vw - 420px)) !important;
+  height: min(260px, 34vh) !important;
+  bottom: auto !important;
+}
+
+/* ─── Móvil / tablet estrecha ───────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .kpk-tourism-widget {
+    left: 10px;
+    right: 10px;
+    bottom: max(92px, env(safe-area-inset-bottom, 0px) + 84px);
+    width: auto;
+    max-width: none;
+    max-height: min(52vh, 420px);
+    border-radius: 18px;
+    z-index: 10006; /* sobre burbuja flotante, bajo HUD móvil extremo */
+  }
+
+  .kpk-tw-media {
+    max-height: 168px;
+  }
+  .kpk-tw-media-stage {
+    height: 136px;
+  }
+  .kpk-tw-body {
+    min-height: 48px;
+    max-height: 88px;
+    padding: 8px 12px 4px;
+  }
+  .kpk-tw-blurb {
+    font-size: 12px;
+    /* 3 líneas visibles, scroll para el resto */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .kpk-tw-body:hover .kpk-tw-blurb,
+  .kpk-tw-body:focus-within .kpk-tw-blurb {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+  .kpk-tw-footer {
+    padding: 7px 10px 9px;
+    gap: 5px;
+  }
+  .kpk-tw-btn {
+    min-width: 0;
+    padding: 7px 8px;
+    font-size: 10.5px;
+  }
+  .kpk-tw-related {
+    max-height: 64px;
+    padding: 6px 10px 8px;
+  }
+
+  body.kpk-tourism-open .kpk-map-widget.is-open {
+    left: 10px !important;
+    right: 10px !important;
+    top: 56px !important;
+    width: auto !important;
+    height: min(200px, 28vh) !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .kpk-tourism-widget {
+    max-height: min(48vh, 380px);
+    bottom: max(88px, env(safe-area-inset-bottom, 0px) + 78px);
+  }
+  .kpk-tw-media-stage { height: 128px; }
+  .kpk-tw-title { font-size: 13.5px; }
+}

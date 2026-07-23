@@ -1,0 +1,3494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KPK Admin — Panel de Administración</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Josefin+Sans:wght@400;500;600&family=Montserrat:wght@500;600;700&family=Outfit:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/ferrari.css?v=43">
+  <link rel="stylesheet" href="css/f-gallery.css">
+  <style>
+    /* ═══════════════════ VARIABLES Y RESET ═══════════════════ */
+    :root {
+      --bg:          #0a0a0f;
+      --bg-2:        rgba(255,255,255,0.04);
+      --bg-3:        rgba(255,255,255,0.05);
+      --glass:       rgba(255,255,255,0.04);
+      --glass-hover: rgba(255,255,255,0.07);
+      --border:      rgba(255,255,255,0.08);
+      --border-hi:   rgba(255,255,255,0.14);
+      --accent:      #00B4FF;
+      --accent-glow: rgba(0,180,255,0.35);
+      --neon-blue:   #00B4FF;
+      --neon-purple: #8B5CF6;
+      --neon-pink:   #FF2D8A;
+      --green:       #34C759;
+      --red:         #FF3B30;
+      --orange:      #FF9500;
+      --gray:        #636366;
+      --gold:        #C9A84C;
+      --text:        #f5f5f7;
+      --text-2:      #a1a1a6;
+      --text-3:      #6e6e73;
+      --radius:      16px;
+      --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      height: 100vh; overflow: hidden;
+    }
+
+    /* ═══ FONDO ANIMADO PREMIUM ═══ */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 55% at 15% 25%, rgba(0,180,255,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 60% at 85% 75%, rgba(139,92,246,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 50% at 50% 10%, rgba(255,45,138,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 45% at 30% 80%, rgba(0,180,255,0.04) 0%, transparent 60%);
+      animation: meshMove 14s ease-in-out infinite alternate;
+    }
+    @keyframes meshMove {
+      0%   { opacity: 0.6; transform: scale(1) rotate(0deg); }
+      50%  { opacity: 0.9; transform: scale(1.03) rotate(0.5deg); }
+      100% { opacity: 0.6; transform: scale(1) rotate(0deg); }
+    }
+
+    /* ═══ LOGIN ═══ */
+    #login-screen {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    }
+    #login-screen.hidden { opacity: 0; transform: scale(0.96) translateY(-16px); pointer-events: none; }
+
+    .login-card {
+      width: 420px;
+      background: rgba(13, 13, 17, 0.75);
+      backdrop-filter: blur(40px) saturate(160%);
+      -webkit-backdrop-filter: blur(40px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px; padding: 48px 40px 40px;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08) inset,
+                  0 0 50px rgba(0,180,255,0.08);
+    }
+    .login-logo { text-align: center; margin-bottom: 36px; }
+    .login-logo-img {
+      height: 72px; object-fit: contain; margin: 0 auto 16px; display: block;
+      filter: drop-shadow(0 2px 10px rgba(0, 180, 255, 0.2)) drop-shadow(0 10px 25px rgba(0,0,0,0.5));
+    }
+    .login-by-link { color: var(--accent); text-decoration: none; transition: color 0.2s, text-shadow 0.2s; font-weight: 500; }
+    .login-by-link:hover { color: #40c8ff; text-shadow: 0 0 12px rgba(0,180,255,0.5); text-decoration: none; }
+    .login-logo h1 { font-size: 23px; font-weight: 700; letter-spacing: -0.4px; }
+    .login-logo p { font-size: 13px; color: var(--text-3); margin-top: 5px; }
+    .login-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group label { font-size: 11.5px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.6px; }
+    .form-group input {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 13px 16px;
+      font-family: inherit; font-size: 14px; color: var(--text);
+      transition: all 0.25s var(--ease); outline: none;
+    }
+    .form-group input::placeholder { color: var(--text-3); }
+    .form-group input:focus {
+      border-color: var(--accent); background: rgba(0,180,255,0.08);
+      box-shadow: 0 0 0 3px rgba(0,180,255,0.25), 0 0 25px rgba(0,180,255,0.15);
+    }
+    .god-toggle {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+      background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 11px; cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .god-toggle:hover { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.3); }
+    .god-toggle.active { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.25); }
+    .god-check {
+      width: 20px; height: 20px; border-radius: 6px;
+      border: 1.5px solid rgba(201,168,76,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--gold); transition: all 0.2s; flex-shrink: 0;
+    }
+    .god-toggle.active .god-check { background: var(--gold); border-color: var(--gold); color: #000; }
+    .god-toggle span { font-size: 13.5px; font-weight: 500; color: var(--gold); }
+    #god-pass-group { display: none; }
+    #god-pass-group.visible { display: flex; }
+    .btn-login {
+      width: 100%; padding: 14px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--neon-purple));
+      border: none;
+      font-family: inherit; font-size: 15px; font-weight: 600; color: white;
+      cursor: pointer; transition: all 0.2s var(--ease);
+      margin-top: 4px; letter-spacing: -0.2px;
+      position: relative; overflow: hidden;
+    }
+    .btn-login::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-login:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(0,180,255,0.35), 0 0 40px rgba(0,180,255,0.1); }
+    .btn-login:hover::before { opacity: 1; }
+    .btn-login:active { transform: translateY(1px); }
+    .btn-login:disabled { opacity: 0.6; pointer-events: none; }
+    .btn-login span { position: relative; z-index: 1; }
+    .login-error { font-size: 13px; color: var(--red); text-align: center; min-height: 18px; }
+
+    /* ═══ APP ═══ */
+    #app { display: none; height: 100vh; flex-direction: column; position: relative; z-index: 1; }
+    #app.visible { display: flex; }
+
+    /* Topbar — Fully integrated dark glassmorphism banner */
+    .topbar {
+      height: 62px; flex-shrink: 0;
+      display: flex; align-items: stretch; justify-content: space-between;
+      background: rgba(13, 13, 17, 0.65);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    }
+    .topbar-left {
+      display: flex; align-items: center; gap: 14px;
+      padding: 0 24px;
+      background: transparent;
+      border-bottom: none;
+    }
+    .topbar-logo-img {
+      height: 34px; object-fit: contain; margin-right: 6px;
+      filter: drop-shadow(0 2px 8px rgba(0, 180, 255, 0.15)) drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    }
+    .topbar-title { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; display: flex; align-items: baseline; gap: 6px; color: var(--text); }
+    .by-text { font-size: 13px; font-weight: 500; color: var(--text-3); }
+    .by-text a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    .by-text a:hover { color: #40c8ff; text-shadow: 0 0 8px rgba(0,180,255,0.4); }
+    .topbar-badge {
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 20px;
+      background: #007AFF; color: #fff;
+    }
+    .topbar-right {
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 24px;
+      background: transparent;
+      border-bottom: none;
+      flex: 1;
+      justify-content: flex-end;
+    }
+    .topbar-user { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--text-2); }
+    .topbar-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--neon-purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 600; color: white; overflow: hidden;
+      box-shadow: 0 0 16px rgba(0,180,255,0.2);
+    }
+    .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .btn-god-link {
+      padding: 8px 15px; border-radius: 9px;
+      background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2);
+      color: var(--gold); font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+      display: none; align-items: center; gap: 6px;
+    }
+    .btn-god-link.visible { display: inline-flex; }
+    .btn-god-link:hover { background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.35); box-shadow: 0 0 16px rgba(201,168,76,0.1); }
+    .btn-refresh {
+      background: rgba(0,180,255,0.06); color: var(--accent); border: 1px solid rgba(0,180,255,0.15);
+      padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 7px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-refresh:hover { background: rgba(0,180,255,0.12); box-shadow: 0 0 16px rgba(0,180,255,0.1); }
+    .btn-refresh svg { transition: transform 0.4s ease; }
+    .btn-refresh.spinning svg { animation: spin-refresh 1s linear infinite; }
+    @keyframes spin-refresh { 100% { transform: rotate(360deg); } }
+
+    .btn-save-cloud {
+      padding: 8px 15px; border-radius: 9px;
+      background: rgba(52,199,89,0.08); border: 1px solid rgba(52,199,89,0.2);
+      color: var(--green); font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-save-cloud:hover { background: rgba(52,199,89,0.15); border-color: rgba(52,199,89,0.35); box-shadow: 0 0 16px rgba(52,199,89,0.12); }
+    .btn-logout {
+      padding: 8px 15px; border-radius: 9px;
+      background: rgba(255,59,48,0.06); border: 1px solid rgba(255,59,48,0.15);
+      color: var(--red); font-family: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-logout:hover { background: rgba(255,59,48,0.12); }
+
+    /* App body */
+    .app-body { flex: 1; display: flex; overflow: hidden; background: rgba(10, 10, 15, 0.4); }
+
+    /* Sidebar — premium dark glass */
+    .sidebar {
+      width: 272px; flex-shrink: 0;
+      background: rgba(18, 18, 24, 0.55);
+      backdrop-filter: blur(30px) saturate(150%);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 20px 18px 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-header h2 {
+      font-size: 11.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-2);
+    }
+    .sidebar-count { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+    .sidebar-list { flex: 1; overflow-y: auto; padding: 10px; }
+    .sidebar-list::-webkit-scrollbar { width: 4px; }
+    .sidebar-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    .lote-item {
+      display: flex; align-items: center; gap: 11px;
+      padding: 12px 13px; border-radius: 11px;
+      cursor: pointer; transition: all 0.15s;
+      border: 1px solid transparent; margin-bottom: 3px;
+    }
+    .lote-item:hover { background: rgba(255,255,255,0.05); }
+    .lote-item.active { background: rgba(0,180,255,0.08); border-color: rgba(0,180,255,0.2); box-shadow: 0 0 12px rgba(0,180,255,0.06); }
+    .lote-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .lote-dot.disponible   { background: var(--green); box-shadow: 0 0 8px rgba(52,199,89,0.5); }
+    .lote-dot.vendido      { background: var(--red);   box-shadow: 0 0 8px rgba(255,59,48,0.5); }
+    .lote-dot.reservado    { background: var(--orange); box-shadow: 0 0 8px rgba(255,149,0,0.5); }
+    .lote-dot.nodisponible { background: var(--gray); box-shadow: 0 0 8px rgba(99,99,102,0.3); }
+    .lote-item-info { flex: 1; min-width: 0; }
+    .lote-item-title { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lote-item-sub { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+
+    .sidebar-empty { text-align: center; padding: 40px 18px; color: var(--text-3); font-size: 13px; line-height: 1.6; }
+    .sidebar-empty .ei { font-size: 36px; margin-bottom: 10px; }
+    .sidebar-nav {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; text-align: left;
+      padding: 11px 12px; border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent; color: var(--text-2);
+      font: inherit; font-size: 13px; font-weight: 650;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .sidebar-nav-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .sidebar-nav-btn.is-on {
+      background: rgba(0,180,255,0.08);
+      border-color: rgba(0,180,255,0.18);
+      color: var(--accent);
+      box-shadow: 0 0 12px rgba(0,180,255,0.05);
+    }
+    .sidebar-nav-ico {
+      width: 28px; height: 28px; border-radius: 9px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,0.04); flex-shrink: 0; font-size: 13px;
+    }
+    .sidebar-nav-btn.is-on .sidebar-nav-ico { background: rgba(0,180,255,0.1); }
+    .sidebar-nav-meta { flex: 1; min-width: 0; }
+    .sidebar-nav-meta strong { display: block; font-size: 13px; }
+    .sidebar-nav-meta span { display: block; font-size: 11px; color: var(--text-3); font-weight: 500; margin-top: 1px; }
+    .sidebar-lotes-wrap { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+    .sidebar-lotes-wrap[hidden], .admin-section[hidden] { display: none !important; }
+    .kpk-toggle-pins-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-2);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      outline: none;
+    }
+    .kpk-toggle-pins-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+    }
+    .contact-preview {
+      margin-top: 8px; padding: 16px; border-radius: 16px;
+      background: linear-gradient(165deg, rgba(28,28,32,0.9), rgba(14,14,16,0.95));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08); color: #f5f5f7;
+    }
+    .contact-preview img { height: 34px; width: auto; max-width: 160px; display: block; margin-bottom: 10px; }
+    .contact-preview strong { display: block; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; margin-bottom: 4px; }
+    .contact-preview p { font-size: 12px; color: rgba(255,255,255,0.55); margin: 0 0 10px; line-height: 1.4; }
+    .contact-preview .cp-row { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+    .contact-preview .cp-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 10px; border-radius: 10px;
+      background: rgba(255,255,255,0.06); width: fit-content;
+    }
+
+    /* Editor — glass cards */
+    .editor { flex: 1; overflow-y: auto; padding: 28px 28px; display: flex; flex-direction: column; gap: 22px; }
+    .editor::-webkit-scrollbar { width: 4px; }
+    .editor::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+    .editor-placeholder {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; color: var(--text-3); gap: 14px;
+    }
+    .editor-placeholder .ph-ico { font-size: 52px; }
+    .editor-placeholder h3 { font-size: 19px; font-weight: 600; color: var(--text-2); }
+    .editor-placeholder p { font-size: 14px; line-height: 1.5; max-width: 250px; }
+
+    .ecard {
+      background: rgba(25, 25, 32, 0.45);
+      backdrop-filter: blur(24px) saturate(150%);
+      -webkit-backdrop-filter: blur(24px) saturate(150%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 22px 24px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ecard:hover {
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px rgba(0,180,255,0.05);
+    }
+    .ecard-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--text-3); margin-bottom: 18px;
+    }
+    .egrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .efield { display: flex; flex-direction: column; gap: 8px; }
+    .efield.full { grid-column: 1 / -1; }
+    .efield label { font-size: 11.5px; font-weight: 600; color: var(--text-2); letter-spacing: 0.3px; }
+    .efield input, .efield select {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 11px 14px;
+      font-family: inherit; font-size: 14px; color: var(--text);
+      transition: all 0.2s; outline: none;
+    }
+    .efield input::placeholder { color: var(--text-3); }
+    .efield input:focus, .efield select:focus {
+      border-color: var(--accent);
+      background: rgba(0,180,255,0.05);
+      box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px rgba(0,180,255,0.06);
+    }
+    .efield select option { background: #1a1a24; }
+    .efield select,
+    select.kpk-dark-select {
+      color-scheme: dark;
+      background-color: #16161e;
+      color: #f0f0f5;
+    }
+    .efield select option,
+    .efield select optgroup,
+    select.kpk-dark-select option,
+    select.kpk-dark-select optgroup {
+      background-color: #16161e !important;
+      color: #f0f0f5 !important;
+    }
+
+    /* Estado selector — neon */
+    .estado-sel { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; grid-column: 1/-1; }
+    .ebtn {
+      padding: 10px 6px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
+      background: transparent; color: var(--text-2);
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.18s; text-align: center; line-height: 1.3;
+    }
+    .ebtn:hover { border-color: rgba(255,255,255,0.18); color: var(--text); }
+    .ebtn.sel-disponible   {
+      background: rgba(52,199,89,0.10); border-color: var(--green); color: var(--green);
+      box-shadow: 0 0 16px rgba(52,199,89,0.15);
+    }
+    .ebtn.sel-vendido      {
+      background: rgba(255,59,48,0.10); border-color: var(--red); color: var(--red);
+      box-shadow: 0 0 16px rgba(255,59,48,0.15);
+    }
+    .ebtn.sel-reservado    {
+      background: rgba(255,149,0,0.10); border-color: var(--orange); color: var(--orange);
+      box-shadow: 0 0 16px rgba(255,149,0,0.15);
+    }
+    .ebtn.sel-nodisponible {
+      background: rgba(99,99,102,0.10); border-color: var(--gray); color: var(--gray);
+      box-shadow: 0 0 12px rgba(99,99,102,0.10);
+    }
+
+    .clp-line {
+      grid-column: 1/-1; font-size: 12.5px; color: var(--text-3);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 13px;
+      background: rgba(0,180,255,0.05); border: 1px solid rgba(0,180,255,0.12); border-radius: 9px;
+    }
+    .clp-line strong { color: var(--accent); font-size: 13px; }
+
+    /* ═══ FOTOS DEL LOTE ═══ */
+    .photo-drop {
+      border: 1.5px dashed rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 22px 16px;
+      text-align: center;
+      background: rgba(0,180,255,0.03);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .photo-drop:hover, .photo-drop.is-drag {
+      border-color: rgba(0,180,255,0.4);
+      background: rgba(0,180,255,0.06);
+    }
+    .photo-drop input {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .photo-drop-ico { font-size: 28px; margin-bottom: 8px; }
+    .photo-drop-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .photo-drop-sub { font-size: 12px; color: var(--text-3); margin-top: 4px; line-height: 1.45; }
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .photo-card {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-card-del {
+      position: absolute; top: 6px; right: 6px;
+      width: 26px; height: 26px; border-radius: 50%;
+      border: none; cursor: pointer;
+      background: rgba(0,0,0,0.6); color: #fff;
+      display: grid; place-items: center;
+      opacity: 0; transition: opacity 0.15s, transform 0.15s;
+      backdrop-filter: blur(8px);
+    }
+    .photo-card:hover .photo-card-del { opacity: 1; }
+    .photo-card-del:hover { background: var(--red); transform: scale(1.06); }
+    .photo-card-idx {
+      position: absolute; left: 6px; bottom: 6px;
+      font-size: 10px; font-weight: 700; color: #fff;
+      background: rgba(0,0,0,0.5); padding: 2px 7px; border-radius: 999px;
+      backdrop-filter: blur(6px);
+    }
+    .photo-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .btn-photo-preview {
+      padding: 9px 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-2);
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn-photo-preview:hover { background: rgba(0,180,255,0.08); color: var(--accent); border-color: rgba(0,180,255,0.25); box-shadow: 0 0 12px rgba(0,180,255,0.06); }
+    .photo-count-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; color: var(--accent);
+      background: rgba(0,180,255,0.08); padding: 2px 8px; border-radius: 999px;
+      margin-left: 8px;
+    }
+    .pbtn.foto { cursor: pointer; }
+    .pbtn.foto:hover { filter: brightness(0.97); transform: translateY(-1px); }
+    .pbtn.foto.is-empty { opacity: 0.55; }
+
+    /* ═══ IDENTIDAD / BRAND DOCK ═══ */
+
+    .brand-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px; padding: 22px 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .brand-card-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.65px; color: var(--text-3); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .brand-card-title .brand-pill {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
+      padding: 3px 8px; border-radius: 999px;
+      background: rgba(201,168,76,0.10); color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.22); text-transform: uppercase;
+      box-shadow: 0 0 8px rgba(201,168,76,0.06);
+    }
+    .brand-card-sub { font-size: 13px; color: var(--text-3); margin-bottom: 18px; line-height: 1.45; }
+    .brand-fields { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .brand-opt-label {
+      font-size: 11.5px; font-weight: 600; color: var(--text-2); letter-spacing: 0.3px; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .brand-opt-hint { font-size: 11px; font-weight: 500; color: var(--text-3); }
+
+    .brand-logo-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+    .brand-logo-card {
+      position: relative; aspect-ratio: 1; border-radius: 14px;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03); overflow: hidden;
+      cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    }
+    .brand-logo-card:hover { border-color: rgba(0,180,255,0.35); transform: translateY(-1px); box-shadow: 0 0 12px rgba(0,180,255,0.06); }
+    .brand-logo-card.is-active { border-color: rgba(0,180,255,0.5); box-shadow: 0 0 0 3px rgba(0,180,255,0.15), 0 0 20px rgba(0,180,255,0.08); }
+    .brand-logo-card.is-pending { border-style: dashed; border-color: rgba(201,168,76,0.4); }
+    .brand-logo-card img {
+      width: 100%; height: 100%; object-fit: contain; display: block; padding: 10px;
+      background: rgba(255,255,255,0.04);
+    }
+    .brand-logo-card-tools {
+      position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center;
+      gap: 4px; padding: 6px;
+      background: linear-gradient(transparent 40%, rgba(0,0,0,0.6));
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .brand-logo-card:hover .brand-logo-card-tools,
+    .brand-logo-card:focus-within .brand-logo-card-tools { opacity: 1; }
+    .brand-logo-card-tools button {
+      width: 28px; height: 28px; border-radius: 8px; border: none;
+      background: rgba(255,255,255,0.9); cursor: pointer;
+      display: grid; place-items: center; color: #1d1d1f;
+    }
+    .brand-logo-card-tools button:hover { background: #fff; }
+    .brand-logo-card-tools button.danger:hover { background: var(--red); color: #fff; }
+    .brand-logo-card-name {
+      position: absolute; left: 6px; top: 6px;
+      font-size: 9px; font-weight: 700; color: #fff;
+      background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 999px;
+      max-width: calc(100% - 12px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      backdrop-filter: blur(6px);
+    }
+    .brand-logo-add {
+      aspect-ratio: 1; border-radius: 14px;
+      border: 1.5px dashed rgba(255,255,255,0.12);
+      background: rgba(0,180,255,0.03);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; cursor: pointer; position: relative; color: var(--accent);
+      font-size: 12px; font-weight: 650;
+    }
+    .brand-logo-add input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .brand-logo-add:hover { background: rgba(0,180,255,0.06); border-color: rgba(0,180,255,0.3); box-shadow: 0 0 12px rgba(0,180,255,0.05); }
+    .brand-logo-add svg { opacity: 0.9; }
+    .brand-banner-row {
+      display: flex; gap: 14px; align-items: stretch;
+      padding: 12px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .brand-banner-thumb {
+      flex: 0 0 min(42%, 220px); min-height: 64px; max-width: 240px;
+      border-radius: 10px; display: grid; place-items: center;
+      background: rgba(0,0,0,0.25);
+      border: 1px dashed rgba(255,255,255,0.14);
+      overflow: hidden; padding: 8px;
+    }
+    .brand-banner-thumb img {
+      max-width: 100%; max-height: 72px; object-fit: contain; display: block;
+    }
+    .brand-banner-thumb .ph { font-size: 11px; color: var(--text-3); }
+    .brand-banner-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .brand-banner-meta strong { font-size: 13px; color: #fff; }
+    .brand-banner-meta > span { font-size: 11px; color: var(--text-3); word-break: break-all; }
+    .brand-banner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .brand-banner-add {
+      position: relative; display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 12px; border-radius: 8px; cursor: pointer;
+      border: 1px dashed rgba(0,180,255,0.35); background: rgba(0,180,255,0.06);
+      color: #9ad8ff; font-size: 12px; font-weight: 600;
+    }
+    .brand-banner-add input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .brand-active-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    }
+    .brand-active-thumb {
+      width: 48px; height: 48px; border-radius: 10px; overflow: hidden;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+      display: grid; place-items: center;
+    }
+    .brand-active-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+    .brand-active-thumb .ph { font-size: 10px; color: var(--text-3); text-align: center; padding: 4px; }
+    .brand-active-meta { flex: 1; min-width: 0; }
+    .brand-active-meta strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand-active-meta span { font-size: 11.5px; color: var(--text-3); }
+
+    .brand-font-grid, .brand-style-grid { display: grid; gap: 8px; }
+    .brand-font-grid { grid-template-columns: repeat(3, 1fr); }
+    .brand-style-grid { grid-template-columns: repeat(5, 1fr); }
+    .brand-font-btn, .brand-style-btn {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      border-radius: 11px; padding: 10px 8px;
+      cursor: pointer; transition: all 0.18s;
+      font-family: inherit; color: var(--text); text-align: center;
+    }
+    .brand-font-btn:hover, .brand-style-btn:hover {
+      border-color: rgba(0,180,255,0.25); background: rgba(0,180,255,0.05);
+      box-shadow: 0 0 10px rgba(0,180,255,0.04);
+    }
+    .brand-font-btn.is-on, .brand-style-btn.is-on {
+      border-color: rgba(0,180,255,0.4);
+      background: rgba(0,180,255,0.08);
+      box-shadow: 0 0 0 3px rgba(0,180,255,0.12), 0 0 16px rgba(0,180,255,0.06);
+    }
+    .brand-font-btn .bf-name { display: block; font-size: 12.5px; font-weight: 700; line-height: 1.2; }
+    .brand-font-btn .bf-meta { display: block; font-size: 10px; color: var(--text-3); margin-top: 3px; letter-spacing: 0.04em; }
+    .brand-font-btn[data-font="cormorant"] .bf-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: 0.06em; }
+    .brand-font-btn[data-font="cinzel"] .bf-name { font-family: 'Cinzel', serif; letter-spacing: 0.1em; font-size: 12px; }
+    .brand-font-btn[data-font="montserrat"] .bf-name { font-family: 'Montserrat', sans-serif; letter-spacing: 0.06em; }
+    .brand-font-btn[data-font="josefin"] .bf-name { font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.08em; }
+    .brand-font-btn[data-font="playfair"] .bf-name { font-family: 'Playfair Display', serif; font-size: 13.5px; }
+    .brand-font-btn[data-font="outfit"] .bf-name { font-family: 'Outfit', sans-serif; }
+    .brand-style-btn { padding: 8px 6px 10px; }
+    .brand-style-thumb {
+      height: 28px; border-radius: 8px; margin-bottom: 6px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .brand-style-thumb span {
+      display: block; height: 10px; width: 70%; border-radius: 999px; background: rgba(255,255,255,0.15);
+    }
+    .bst-crystal { background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04)); border: 1px solid rgba(255,255,255,0.15); }
+    .bst-obsidian { background: linear-gradient(180deg, #2a2a2e, #121214); border: 1px solid rgba(255,255,255,0.12); }
+    .bst-obsidian span { background: rgba(255,255,255,0.35); }
+    .bst-ivory { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+    .bst-graphite { background: #1c1c1e; border: 1px solid rgba(255,255,255,0.08); }
+    .bst-graphite span { background: rgba(255,255,255,0.35); }
+    .bst-champagne { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); }
+    .bst-champagne::after {
+      content: ''; position: absolute; left: 18%; right: 18%; bottom: 5px; height: 1.5px;
+      background: linear-gradient(90deg, transparent, #C9A84C, transparent);
+    }
+    /* Skins luxury 2026 */
+    .bst-obsidian-gold {
+      background: linear-gradient(180deg, #1c1c20, #0a0a0c);
+      border: 1px solid rgba(201,168,76,0.35);
+    }
+    .bst-obsidian-gold span { background: rgba(232,201,106,0.7); }
+    .bst-obsidian-gold::after {
+      content: ''; position: absolute; left: 12%; right: 12%; bottom: 4px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.7), transparent);
+    }
+    .bst-bordeaux {
+      background: linear-gradient(180deg, #4a1024, #2a0716);
+      border: 1px solid rgba(176,141,87,0.4);
+    }
+    .bst-bordeaux span { background: rgba(245,233,217,0.6); }
+    .bst-bordeaux::after {
+      content: ''; position: absolute; left: 12%; right: 12%; bottom: 4px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(176,141,87,0.85), transparent);
+    }
+    .bst-platinum {
+      background: linear-gradient(180deg, #f8f9fb, #dfe3e8);
+      border: 0.5px solid rgba(154,160,166,0.4);
+    }
+    .bst-platinum span { background: rgba(15,23,42,0.45); }
+    .bst-platinum::after {
+      content: ''; position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      width: 5px; height: 5px; border-radius: 50%; background: #0A4DFF;
+      box-shadow: 0 0 6px rgba(10,77,255,0.55);
+    }
+    .brand-style-btn .bs-name { font-size: 10px; font-weight: 700; color: var(--text-2); letter-spacing: 0.02em; }
+
+    .brand-toggle {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 14px; border-radius: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    }
+    .brand-toggle-text { font-size: 12.5px; color: var(--text-2); line-height: 1.35; }
+    .brand-toggle-text strong { display: block; color: var(--text); font-size: 13px; margin-bottom: 2px; }
+    .brand-switch { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+    .brand-switch input { opacity: 0; width: 0; height: 0; }
+    .brand-switch span {
+      position: absolute; inset: 0; border-radius: 999px; cursor: pointer;
+      background: rgba(255,255,255,0.12); transition: 0.2s;
+    }
+    .brand-switch span::before {
+      content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%;
+      left: 3px; top: 3px; background: #fff; transition: 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .brand-switch input:checked + span { background: var(--accent); box-shadow: 0 0 8px rgba(0,180,255,0.3); }
+    .brand-switch input:checked + span::before { transform: translateX(18px); }
+
+    /* ── PALETA DE COLORES (Hover Only) ── */
+    .hover-color-picker {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+      margin-top: 4px;
+    }
+    .hcp-label { font-size: 12.5px; font-weight: 500; color: var(--text-2); }
+    .hcp-options { display: flex; gap: 8px; align-items: center; }
+    .hcp-dot {
+      width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; position: relative; transition: all 0.2s var(--ease); outline: none;
+    }
+    .hcp-dot:hover { transform: scale(1.18); }
+    .hcp-dot.active {
+      border: 2px solid #ffffff !important;
+      transform: scale(1.22);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 255, 255, 0.45) !important;
+    }
+
+
+    .brand-dock-preview {
+      margin-top: 2px;
+      display: flex; justify-content: center; align-items: center;
+      padding: 28px 16px; border-radius: 16px; min-height: 110px;
+      background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(0,0,0,0.4), rgba(10,12,18,0.95));
+      border: 1px solid rgba(255,255,255,0.06); overflow: hidden;
+    }
+    .brand-dock-preview .kpk-brand-dock {
+      position: relative !important; top: auto !important; left: auto !important;
+      transform: none !important; opacity: 1 !important; visibility: visible !important;
+      max-width: 100%; pointer-events: none;
+    }
+    .brand-dock-preview .kpk-brand-dock__name { max-width: min(100%, 520px); }
+    .brand-dock-preview-empty { font-size: 12.5px; color: rgba(255,255,255,0.45); letter-spacing: 0.02em; }
+    .btn-brand-save {
+      align-self: flex-end;
+      padding: 11px 20px; border-radius: 11px;
+      background: linear-gradient(135deg, var(--accent), var(--neon-purple));
+      border: none; color: #fff;
+      font-family: inherit; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.2s var(--ease);
+    }
+    .btn-brand-save:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,180,255,0.3), 0 0 30px rgba(0,180,255,0.08); }
+    .btn-brand-save:disabled { opacity: 0.55; pointer-events: none; }
+    @media (max-width: 1100px) {
+      .brand-style-grid { grid-template-columns: repeat(3, 1fr); }
+      .brand-font-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .brand-style-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Save button — neon */
+    .save-wrap { display: flex; justify-content: flex-end; }
+    .btn-save {
+      padding: 14px 34px; border-radius: 13px;
+      background: linear-gradient(135deg, var(--accent), var(--neon-purple));
+      border: none;
+      font-family: inherit; font-size: 15px; font-weight: 600; color: white;
+      cursor: pointer; transition: all 0.22s var(--ease);
+      display: flex; align-items: center; gap: 10px;
+      min-width: 168px; justify-content: center; letter-spacing: -0.2px;
+      position: relative; overflow: hidden;
+    }
+    .btn-save::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(0,180,255,0.35), 0 0 40px rgba(0,180,255,0.1); }
+    .btn-save:hover::before { opacity: 1; }
+    .btn-save:active { transform: translateY(1px); }
+    .btn-save.loading { pointer-events: none; opacity: 0.6; }
+    .btn-save.success { background: var(--green); pointer-events: none; }
+    .btn-save > * { position: relative; z-index: 1; }
+    .btn-spin {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .btn-save.loading .btn-spin { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Preview — glass */
+    .preview-panel {
+      width: 340px; flex-shrink: 0;
+      border-left: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(16px) saturate(130%);
+      -webkit-backdrop-filter: blur(16px) saturate(130%);
+      display: flex; flex-direction: column;
+    }
+    .preview-header {
+      padding: 20px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .preview-header h2 {
+      font-size: 11.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-2);
+    }
+    .preview-header p { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+    .preview-body {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 28px;
+    }
+
+    /* Tarjeta espectador — macOS glassmorphism */
+    .pcard {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(30px) saturate(160%);
+      -webkit-backdrop-filter: blur(30px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.08);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      transition: all 0.3s var(--ease);
+      overflow: hidden;
+    }
+    .pcard:hover { box-shadow: 0 24px 48px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.08), 0 0 30px rgba(0,180,255,0.04); }
+    .pcard-inner { padding: 24px; position: relative; }
+    .ppill {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 4px 10px; border-radius: 20px; color: #fff; margin-bottom: 8px;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .ppill.disponible   { background: #34C759; box-shadow: 0 0 12px rgba(52,199,89,0.3); }
+    .ppill.vendido      { background: #FF3B30; box-shadow: 0 0 12px rgba(255,59,48,0.3); }
+    .ppill.reservado    { background: #FF9500; box-shadow: 0 0 12px rgba(255,149,0,0.3); }
+    .ppill.nodisponible { background: #636366; box-shadow: 0 0 8px rgba(99,99,102,0.2); }
+    .ptitle { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); margin-bottom: 18px; }
+    .prows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .prow { display: flex; justify-content: space-between; align-items: center; }
+    .plabel { font-size: 12px; font-weight: 500; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.3px; }
+    .pval { font-size: 14px; font-weight: 600; color: var(--text); }
+    .pval.clp { color: var(--accent); font-size: 15px; font-weight: 700; }
+    .pdiv { height: 1px; background: rgba(255,255,255,0.06); margin: 2px 0; }
+    .pfoot { display: flex; gap: 8px; }
+    .pbtn {
+      flex: 1; height: 42px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      font-size: 13px; font-weight: 600; border: none; cursor: default;
+    }
+    .pbtn.foto { background: rgba(255,255,255,0.06); color: var(--text); }
+    .pbtn.wsp  { background: linear-gradient(135deg,#25D366,#1EBE55); color: white; box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(18px);
+      background: rgba(24,24,36,0.92); backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.10); border-radius: 12px;
+      padding: 12px 22px; font-size: 14px; font-weight: 500; color: var(--text);
+      opacity: 0; transition: all 0.32s var(--ease); z-index: 999; white-space: nowrap;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.5);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: rgba(52,199,89,0.35); color: var(--green); box-shadow: 0 8px 26px rgba(0,0,0,0.5), 0 0 16px rgba(52,199,89,0.1); }
+    .toast.error   { border-color: rgba(255,59,48,0.35); color: var(--red); box-shadow: 0 8px 26px rgba(0,0,0,0.5), 0 0 16px rgba(255,59,48,0.1); }
+    .toast.info    { border-color: rgba(0,180,255,0.25); color: var(--accent); box-shadow: 0 8px 26px rgba(0,0,0,0.5), 0 0 16px rgba(0,180,255,0.08); }
+
+    /* Confetti */
+    @keyframes cfAll { from { opacity:1; transform: translateY(0) rotate(0deg); } to { opacity:0; transform: translateY(220px) rotate(720deg); } }
+    .cf { position: fixed; pointer-events: none; z-index: 9999; border-radius: 2px; animation: cfAll 1.2s var(--ease) forwards; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    /* ══ RESPONSIVE MÓVIL Y TABLET ══ */
+    @media (max-width: 900px) {
+      .topbar { height: 56px; }
+      .topbar-left { gap: 8px; padding: 0 12px; }
+      .topbar-right { gap: 8px; padding: 0 12px; }
+      .topbar-logo-img { height: 26px; }
+      .topbar-title { font-size: 14px; }
+      .by-text { display: none; }
+      .topbar-badge { display: none; }
+      
+      .topbar-user span { display: none; }
+      .topbar-avatar { width: 30px; height: 30px; font-size: 12px; }
+      
+      .btn-txt { display: none; }
+      .btn-save-cloud, .btn-god-link, .btn-logout, .btn-refresh { padding: 8px; border-radius: 50%; gap: 0; }
+      
+      .app-body { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; max-height: 40vh; }
+      .editor { width: 100%; height: auto; min-height: 60vh; }
+    }
+    
+    /* ══ TUTORIAL INTERACTIVO ══ */
+    #tutorial-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.7); z-index: 10000;
+      display: none; transition: opacity 0.3s; opacity: 0; pointer-events: auto;
+    }
+    #tutorial-bubble {
+      position: absolute;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(30px) saturate(160%);
+      -webkit-backdrop-filter: blur(30px) saturate(160%);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px; padding: 16px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      width: 280px; z-index: 10001;
+      display: none; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      opacity: 0; transform: translateY(10px); pointer-events: auto;
+    }
+    .t-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; color: var(--accent); }
+    .t-text { font-size: 13px; color: var(--text); line-height: 1.4; margin-bottom: 16px; }
+    .t-foot { display: flex; justify-content: space-between; align-items: center; }
+    .t-step { font-size: 11px; color: var(--text-3); font-weight: 600; }
+    .t-btn { 
+      background: linear-gradient(135deg, var(--accent), var(--neon-purple));
+      color: #fff; border: none; padding: 6px 12px;
+      border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+    }
+    .t-btn:hover { opacity: 0.9; }
+    .tutorial-highlight {
+      position: relative !important; z-index: 10002 !important;
+      box-shadow: 0 0 0 4px var(--accent), 0 0 24px rgba(0,180,255,0.4) !important;
+      background: rgba(255,255,255,0.04); pointer-events: none !important; border-radius: 4px;
+    }
+    .btn-tutorial {
+      background: rgba(0,180,255,0.08); color: var(--accent); border: 1px solid rgba(0,180,255,0.2);
+      padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    }
+    .btn-tutorial:hover { background: rgba(0,180,255,0.15); box-shadow: 0 0 12px rgba(0,180,255,0.08); }
+    
+    /* ══ MODO DIOS ══ */
+    #god-layer {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000; z-index: 99999; display: none;
+    }
+    #god-layer.visible { display: block; }
+    #god-frame { width: 100%; height: 100%; border: none; }
+    #btn-close-god {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(0,0,0,0.6); color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      width: 40px; height: 40px; border-radius: 50%;
+      font-size: 20px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 100000; transition: all 0.2s;
+      backdrop-filter: blur(12px);
+    }
+    #btn-close-god:hover {
+      background: rgba(255,0,0,0.7); border-color: var(--red);
+      transform: scale(1.1); box-shadow: 0 0 20px rgba(255,59,48,0.3);
+    }
+
+    /* ══ ESTILOS DE ETIQUETAS PREMIUM (HASHTAGS) ══ */
+    .kpk-spec-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 4px 16px 16px 16px;
+      justify-content: flex-start;
+    }
+    .kpk-spec-tag {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #e5e7eb;
+      padding: 5px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .kpk-spec-tag span {
+      color: #00B4FF;
+      font-weight: 700;
+    }
+    .kpk-spec-tag:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(0, 180, 255, 0.35);
+      transform: translateY(-1.5px);
+      color: #fff;
+    }
+  </style>
+  <!-- Configuración predeterminada y local -->
+  <script src="config.js?v=3"></script>
+  <script src="config.local.js" onerror="window.KPK_CONFIG=window.KPK_CONFIG||null"></script>
+</head>
+<body>
+<!-- ═══ TUTORIAL OVERLAY ═══ -->
+<div id="tutorial-overlay"></div>
+<div id="tutorial-bubble">
+  <div class="t-title" id="t-title">Paso 1</div>
+  <div class="t-text" id="t-text">Texto de ayuda...</div>
+  <div class="t-foot">
+    <span class="t-step" id="t-step">1 / 5</span>
+    <button class="t-btn" id="t-next" onclick="TutorialSystem.next()">Siguiente</button>
+  </div>
+</div>
+
+<div class="bg-mesh"></div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="https://raw.githubusercontent.com/iLyCoNs/austral-drones/refs/heads/main/logobanner.png" alt="Austral Drones" class="login-logo-img">
+      <h1>MODO ADMIN 360°</h1>
+      <p>by <a href="https://australdrone.cl" target="_blank" class="login-by-link">australdrone.cl</a></p>
+    </div>
+    <div class="login-form">
+      <div class="login-inputs">
+        <div class="form-group">
+          <label>Usuario GitHub</label>
+          <input type="text" id="li-user" placeholder="Ej: iLyCoNs" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <label>Repositorio GitHub</label>
+          <input type="text" id="li-repo" placeholder="Ej: alercepatagon360" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <label>Token (PAT)</label>
+          <input type="password" id="li-pat" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        </div>
+      </div>
+      <div class="login-error" id="li-err"></div>
+      <button class="btn-login" id="btn-login" onclick="doLogin()"><span>Ingresar al Panel</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <img src="https://raw.githubusercontent.com/iLyCoNs/austral-drones/refs/heads/main/logobanner.png" alt="Austral Drones" class="topbar-logo-img">
+      <div class="topbar-title">MODO ADMIN 360° <span class="by-text">by <a href="https://australdrone.cl" target="_blank">australdrone.cl</a></span></div>
+      <div class="topbar-badge" id="adm-badge">Admin</div>
+    </div>
+    <div class="topbar-right">
+      <!-- Botón Tutorial -->
+      <button class="btn-tutorial" id="btn-tutorial" onclick="TutorialSystem.start()" title="Ver Tutorial">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="btn-txt">Ayuda</span>
+      </button>
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="usr-avatar">A</div>
+        <span id="usr-label">—</span>
+      </div>
+      <!-- Botón recargar (refresh) -->
+      <button class="btn-refresh" id="btn-refresh" onclick="refreshAdmin()" title="Recargar pines de GitHub">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        <span class="btn-txt">Recargar</span>
+      </button>
+      <!-- Botón guardar todo en GitHub (visible siempre) -->
+      <button class="btn-save-cloud" id="btn-save-all" onclick="saveAll()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        <span class="btn-txt" id="save-all-txt">Guardar en GitHub</span>
+      </button>
+      <a id="btn-god-link" class="btn-god-link" href="#" onclick="event.preventDefault(); toggleGodLayer();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span class="btn-txt">Abrir Modo Dios</span>
+      </a>
+      <button class="btn-logout" onclick="doLogout()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <span class="btn-txt">Cerrar Sesión</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-nav" id="sidebar-nav" role="tablist">
+        <button type="button" class="sidebar-nav-btn is-on" data-section="lotes" role="tab">
+          <span class="sidebar-nav-ico">📍</span>
+          <span class="sidebar-nav-meta"><strong>Lotes</strong><span>Smart Pins y ficha</span></span>
+        </button>
+        <button type="button" class="sidebar-nav-btn" data-section="identidad" role="tab">
+          <span class="sidebar-nav-ico">✦</span>
+          <span class="sidebar-nav-meta"><strong>Identidad</strong><span>Dock título y logo</span></span>
+        </button>
+        <button type="button" class="sidebar-nav-btn" data-section="contacto" role="tab">
+          <span class="sidebar-nav-ico">✉</span>
+          <span class="sidebar-nav-meta"><strong>Contacto</strong><span>WhatsApp · FormSubmit · 360°</span></span>
+        </button>
+      </div>
+
+      <div class="sidebar-lotes-wrap" id="sidebar-lotes-wrap">
+        <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2>Smart Pins</h2>
+            <div class="sidebar-count" id="sb-count">0 lotes</div>
+          </div>
+          <button type="button" id="btn-toggle-pins" class="kpk-toggle-pins-btn" title="Quitar/Restaurar todos los Smart Pins">
+            Quitar todos
+          </button>
+        </div>
+        <div class="sidebar-list" id="sb-list">
+          <div class="sidebar-empty"><div class="ei">📍</div><p>No hay lotes con Smart Pin.<br>Agrega pines desde el visor primero.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor -->
+    <div class="editor" id="editor-area">
+      <!-- Identidad del proyecto (dock superior del tour) -->
+      <div class="brand-card admin-section" id="brand-card" data-admin-section="identidad" hidden>
+        <div class="brand-card-title">
+          Identidad del proyecto
+          <span class="brand-pill">Dock superior</span>
+        </div>
+        <p class="brand-card-sub">
+          Galería de logos en GitHub, tipografía lujosa y skins minimalistas del dock.
+          Elige, renombra o elimina logos; publica todo con tu token.
+        </p>
+        <div class="brand-fields">
+          <div>
+            <div class="brand-opt-label">
+              Galería de logos
+              <span class="brand-opt-hint">assets/brand/logos/</span>
+            </div>
+            <div class="brand-logo-gallery" id="brand-logo-gallery"></div>
+            <div class="brand-active-row" id="brand-active-row" style="margin-top:12px">
+              <div class="brand-active-thumb" id="brand-active-thumb"><span class="ph">Sin logo</span></div>
+              <div class="brand-active-meta">
+                <strong id="brand-active-name">Ningún logo activo</strong>
+                <span id="brand-active-hint">Sube uno o selecciona de la galería</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="efield full">
+            <label>Nombre del proyecto / loteo</label>
+            <input type="text" id="brand-name" placeholder="Ej: Residencial Los Álamos" maxlength="90" oninput="liveBrandPreview()">
+            <span class="brand-opt-hint" style="margin-top:4px;display:block;font-size:11px;color:var(--text-3);">Se usa en el título de la pestaña. Si subes un banner PNG, ese archivo reemplaza el texto en el dock del 360°.</span>
+          </div>
+
+          <div class="efield full">
+            <div class="brand-opt-label">
+              Banner de título (PNG transparente)
+              <span class="brand-opt-hint">assets/brand/banners/</span>
+            </div>
+            <p class="brand-card-sub" style="margin:0 0 10px;font-size:12px;">
+              Reemplaza el dock de título en el tour 360°: queda <b>solo tu PNG</b> (sin barra/pila de glass), con tamaño ajustable abajo.
+              Ideal: PNG con transparencia. Si configuras un link, al tocar el banner se abre la web oficial.
+            </p>
+            <div class="brand-banner-row" id="brand-banner-row">
+              <div class="brand-banner-thumb" id="brand-banner-thumb"><span class="ph">Sin banner</span></div>
+              <div class="brand-banner-meta">
+                <strong id="brand-banner-name">Ningún banner</strong>
+                <span id="brand-banner-hint">Sube un PNG transparente</span>
+                <div class="brand-banner-actions">
+                  <label class="brand-logo-add brand-banner-add" title="Subir banner PNG">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    <span>Subir PNG</span>
+                    <input type="file" id="brand-banner-input" accept="image/png,.png" />
+                  </label>
+                  <button type="button" class="btn-ghost" id="btn-brand-banner-clear" onclick="clearTitleBanner()" style="display:none;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#fff;cursor:pointer;font-family:inherit;font-size:12px;">Quitar banner</button>
+                </div>
+              </div>
+            </div>
+            <div class="efield full" style="margin-top:12px;">
+              <label for="brand-banner-href">Link al hacer clic en el banner (web oficial)</label>
+              <input type="url" id="brand-banner-href" placeholder="https://www.tuproyecto.cl" inputmode="url" autocomplete="url" oninput="liveBrandPreview()">
+              <span class="brand-opt-hint" style="margin-top:4px;display:block;font-size:11px;color:var(--text-3);">Ej: https://www.alercepatagon.cl — se abre en una pestaña nueva desde el 360°.</span>
+            </div>
+            <div class="efield full" style="margin-top:14px;">
+              <label for="brand-banner-scale">Tamaño del banner en el 360°</label>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+                <input type="range" id="brand-banner-scale" min="40" max="220" step="5" value="100" oninput="onBannerScaleInput()" style="flex:1;accent-color:#00b4ff;">
+                <strong id="brand-banner-scale-val" style="min-width:3.2em;font-variant-numeric:tabular-nums;font-size:13px;">100%</strong>
+              </div>
+              <span class="brand-opt-hint" style="margin-top:4px;display:block;font-size:11px;color:var(--text-3);">Solo la foto PNG (sin pila/glass). Ajusta a voluntad y publica identidad.</span>
+            </div>
+          </div>
+
+
+
+          <div>
+            <div class="brand-opt-label">Tipografía del dock</div>
+            <div class="brand-font-grid" id="brand-font-grid">
+              <button type="button" class="brand-font-btn is-on" data-font="cormorant"><span class="bf-name">Cormorant</span><span class="bf-meta">luxury serif</span></button>
+              <button type="button" class="brand-font-btn" data-font="cinzel"><span class="bf-name">Cinzel</span><span class="bf-meta">editorial · oro</span></button>
+              <button type="button" class="brand-font-btn" data-font="montserrat"><span class="bf-name">Montserrat</span><span class="bf-meta">moderna</span></button>
+              <button type="button" class="brand-font-btn" data-font="josefin"><span class="bf-name">Josefin</span><span class="bf-meta">elegante</span></button>
+              <button type="button" class="brand-font-btn" data-font="playfair"><span class="bf-name">Playfair</span><span class="bf-meta">clásica</span></button>
+              <button type="button" class="brand-font-btn" data-font="outfit"><span class="bf-name">Outfit</span><span class="bf-meta">limpia</span></button>
+            </div>
+          </div>
+
+          <div>
+            <div class="brand-opt-label">Diseño del dock</div>
+            <div class="brand-style-grid" id="brand-style-grid">
+              <button type="button" class="brand-style-btn is-on" data-style="crystal">
+                <div class="brand-style-thumb bst-crystal"><span></span></div>
+                <div class="bs-name">Crystal</div>
+              </button>
+              <button type="button" class="brand-style-btn" data-style="obsidian">
+                <div class="brand-style-thumb bst-obsidian"><span></span></div>
+                <div class="bs-name">Obsidian</div>
+              </button>
+              <button type="button" class="brand-style-btn" data-style="ivory">
+                <div class="brand-style-thumb bst-ivory"><span></span></div>
+                <div class="bs-name">Ivory</div>
+              </button>
+              <button type="button" class="brand-style-btn" data-style="graphite">
+                <div class="brand-style-thumb bst-graphite"><span></span></div>
+                <div class="bs-name">Graphite</div>
+              </button>
+              <button type="button" class="brand-style-btn" data-style="champagne">
+                <div class="brand-style-thumb bst-champagne"><span></span></div>
+                <div class="bs-name">Champagne</div>
+              </button>
+              <button type="button" class="brand-style-btn" data-style="obsidian-gold">
+                <div class="brand-style-thumb bst-obsidian-gold"><span></span></div>
+                <div class="bs-name">Obsidian Gold</div>
+              </button>
+              <button type="button" class="brand-style-btn" data-style="bordeaux">
+                <div class="brand-style-thumb bst-bordeaux"><span></span></div>
+                <div class="bs-name">Bordeaux</div>
+              </button>
+              <button type="button" class="brand-style-btn" data-style="platinum">
+                <div class="brand-style-thumb bst-platinum"><span></span></div>
+                <div class="bs-name">Platinum</div>
+              </button>
+            </div>
+          </div>
+
+          <label class="brand-toggle" for="brand-mobile-solid">
+            <div class="brand-toggle-text">
+              <strong>Móvil sin transparencia</strong>
+              En pantallas chicas usa fondo sólido (sin blur) para ahorrar GPU. El usuario del tour lo hereda de esta preferencia.
+            </div>
+            <div class="brand-switch">
+              <input type="checkbox" id="brand-mobile-solid" checked onchange="liveBrandPreview()">
+              <span></span>
+            </div>
+          </label>
+
+          <label class="brand-toggle" for="brand-hide-lote-fill">
+            <div class="brand-toggle-text">
+              <strong>Ocultar relleno de lotes</strong>
+              Quita el fondo gris semitransparente interior de los lotes en el visor, dejando visibles únicamente las líneas y vértices.
+            </div>
+            <div class="brand-switch">
+              <input type="checkbox" id="brand-hide-lote-fill" onchange="liveBrandPreview()">
+              <span></span>
+            </div>
+          </label>
+
+          <label class="brand-toggle" for="brand-lote-fill-hover-only">
+            <div class="brand-toggle-text">
+              <strong>Relleno solo en Hover</strong>
+              Oculta el relleno interior de todos los lotes, pero muestra el relleno de color del lote de manera individual al pasar el cursor sobre él.
+            </div>
+            <div class="brand-switch">
+              <input type="checkbox" id="brand-lote-fill-hover-only" onchange="liveBrandPreview()">
+              <span></span>
+            </div>
+          </label>
+
+          <div id="brand-hover-color-container" style="display: none; margin-top: 4px;">
+            <div class="hover-color-picker">
+              <div class="hcp-label">Color de realce (Hover):</div>
+              <div class="hcp-options">
+                <button type="button" class="hcp-dot active" data-color="neon-green" style="background: #39FF14; box-shadow: 0 0 8px rgba(57, 255, 20, 0.6);" onclick="setHoverColor('neon-green')" title="Verde Neón Claro"></button>
+                <button type="button" class="hcp-dot" data-color="neon-blue" style="background: #00E5FF; box-shadow: 0 0 8px rgba(0, 229, 255, 0.6);" onclick="setHoverColor('neon-blue')" title="Celeste Neón"></button>
+                <button type="button" class="hcp-dot" data-color="neon-pink" style="background: #FF007F; box-shadow: 0 0 8px rgba(255, 0, 127, 0.6);" onclick="setHoverColor('neon-pink')" title="Rosa Neón"></button>
+                <button type="button" class="hcp-dot" data-color="neon-orange" style="background: #FF9100; box-shadow: 0 0 8px rgba(255, 145, 0, 0.6);" onclick="setHoverColor('neon-orange')" title="Naranja Neón"></button>
+                <button type="button" class="hcp-dot" data-color="glass-white" style="background: #FFFFFF; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);" onclick="setHoverColor('glass-white')" title="Cristal Blanco"></button>
+              </div>
+            </div>
+          </div>
+
+
+          <div>
+            <div class="brand-opt-label">Vista previa del tour</div>
+            <div class="brand-dock-preview" aria-label="Vista previa del dock">
+              <div id="brand-preview-empty" class="brand-dock-preview-empty">Escribe el nombre, elige un logo o sube un banner</div>
+              <div id="kpk-brand-dock" class="kpk-brand-dock dock-style-crystal" aria-hidden="true" hidden>
+                <div class="kpk-brand-dock__glass">
+                  <div id="kpk-brand-logo-wrap" class="kpk-brand-dock__logo-wrap" hidden>
+                    <img id="kpk-brand-logo" alt="">
+                  </div>
+                  <div class="kpk-brand-dock__text">
+                    <span id="kpk-brand-name" class="kpk-brand-dock__name" hidden></span>
+                  </div>
+                  <a id="kpk-brand-title-banner-link" class="kpk-brand-dock__banner-link" hidden tabindex="-1">
+                    <img id="kpk-brand-title-banner" class="kpk-brand-dock__banner" alt="" hidden>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-brand-save" id="btn-brand-save" onclick="saveBrand()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span id="brand-save-txt">Publicar identidad en GitHub</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="brand-card admin-section" id="contact-card" data-admin-section="contacto" hidden>
+        <div class="brand-card-title">
+          Contacto y leads
+          <span class="brand-pill">Tour + tarjeta lote</span>
+        </div>
+        <p class="brand-card-sub">
+          Configura WhatsApp del proyecto, el correo FormSubmit de la ficha de lote
+          y el formulario FormSubmit de la ficha de lote.
+        </p>
+        <div class="brand-fields">
+          <div class="ecard" style="padding:16px 18px;margin:0">
+            <div class="ecard-title">Proyecto · tarjeta Smart Pin</div>
+            <div class="egrid">
+              <div class="efield full">
+                <label>WhatsApp ventas (solo numeros, con codigo pais)</label>
+                <input type="text" id="contact-whatsapp" placeholder="+569XXXXXXXX" inputmode="tel">
+              </div>
+              <div class="efield full">
+                <label>Correo FormSubmit (destino de consultas / reservas)</label>
+                <input type="email" id="contact-form-email" placeholder="ventas@tudominio.cl">
+              </div>
+              <div class="efield full">
+                <label class="brand-toggle" for="contact-form-enabled" style="margin:0">
+                  <div class="brand-toggle-text">
+                    <strong>Formulario activo en la tarjeta</strong>
+                    El comprador puede pedir informacion o reserva desde el lote.
+                  </div>
+                  <div class="brand-switch">
+                    <input type="checkbox" id="contact-form-enabled" checked>
+                    <span></span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <p class="brand-card-sub" style="margin:12px 0 0">
+              FormSubmit envia un correo con tabla (lote, UF, tipo de solicitud, datos del cliente).
+              La primera vez debes confirmar el correo en el link que FormSubmit te envia.
+            </p>
+          </div>
+
+          <div class="ecard" style="padding:16px 18px;margin:12px 0 0">
+            <div class="ecard-title">Notificaciones de Reservas a tu WhatsApp (Gratis)</div>
+            <div class="egrid">
+              <div class="efield full">
+                <label class="brand-toggle" for="contact-wa-alerts-enabled" style="margin:0">
+                  <div class="brand-toggle-text">
+                    <strong>Habilitar notificaciones por WhatsApp</strong>
+                    Recibe un WhatsApp cada vez que un cliente cotice o reserve en la web.
+                  </div>
+                  <div class="brand-switch">
+                    <input type="checkbox" id="contact-wa-alerts-enabled">
+                    <span></span>
+                  </div>
+                </label>
+              </div>
+              <div class="efield">
+                <label>Tu número de celular (con código de país, ej: +569XXXXXXXX)</label>
+                <input type="text" id="contact-wa-alerts-phone" placeholder="+569XXXXXXXX" inputmode="tel">
+              </div>
+              <div class="efield">
+                <label>API Key de CallMeBot (clave recibida por WhatsApp)</label>
+                <input type="password" id="contact-wa-alerts-key" placeholder="Pega tu API Key aquí...">
+              </div>
+            </div>
+            <p class="brand-card-sub" style="margin:12px 0 0; font-size:11px;">
+              <strong>Cómo obtener la API Key gratis:</strong> Agrega a tus contactos al bot de WhatsApp <strong>+34 621 34 22 27</strong> (o haz click <a href="https://wa.me/34621342227" target="_blank" style="color:var(--accent)">aquí</a>), mándale el mensaje <code>I allow callmebot to send me messages</code> y te devolverá tu clave de 6 dígitos al instante.
+            </p>
+          </div>
+
+          <div class="ecard" id="contact-platform-lock" style="padding:16px 18px;margin:0" hidden>
+            <div class="ecard-title">Plataforma · Consigue tu 360 <span style="opacity:.5;font-weight:500;text-transform:none;letter-spacing:0">(ALT+X)</span></div>
+            <div class="egrid">
+              <div class="efield full">
+                <label>Texto del boton CTA</label>
+                <input type="text" id="contact-platform-cta" placeholder="Consigue tu 360° aquí" maxlength="48">
+              </div>
+              <div class="efield">
+                <label>Nombre marca</label>
+                <input type="text" id="contact-platform-name" placeholder="Austral Drone">
+              </div>
+              <div class="efield">
+                <label>WhatsApp disenador</label>
+                <input type="text" id="contact-platform-wa" placeholder="+569XXXXXXXX" inputmode="tel">
+              </div>
+              <div class="efield full">
+                <label>Sitio web</label>
+                <input type="url" id="contact-platform-web" placeholder="https://www.australdrone.cl">
+              </div>
+              <div class="efield full">
+                <label>Logo (URL)</label>
+                <input type="url" id="contact-platform-logo" placeholder="https://raw.githubusercontent.com/.../logobanner.png">
+              </div>
+            </div>
+            <div class="contact-preview" id="contact-preview">
+              <img id="contact-preview-logo" alt="" hidden>
+              <strong id="contact-preview-name">Austral Drone</strong>
+              <p id="contact-preview-cta">Consigue tu 360° aquí</p>
+              <div class="cp-row">
+                <span class="cp-pill" id="contact-preview-web">www.australdrone.cl</span>
+                <span class="cp-pill" id="contact-preview-wa">WhatsApp</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn-brand-save" id="btn-contact-save" onclick="saveBrand()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Publicar contacto en GitHub</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="editor-placeholder admin-section" id="ed-placeholder" data-admin-section="lotes">
+        <div class="ph-ico">✏️</div>
+        <h3>Selecciona un Lote a Modificar</h3>
+        <p>1. Busca en la lista de la izquierda el lote que deseas administrar.<br>2. Haz clic sobre él para abrir su información.<br>3. Modifica precios, descripción o su estado de venta.</p>
+      </div>
+      <div id="ed-form" class="admin-section" data-admin-section="lotes" style="display:none; flex-direction:column; gap:22px;">
+        <div class="ecard">
+          <div class="ecard-title">Información del Lote</div>
+          <div class="egrid">
+            <div class="efield full">
+              <label>Nombre / ID del Lote</label>
+              <input type="text" id="f-titulo" placeholder="Ej: Lote 01 — Sector Norte" oninput="liveUpdate()">
+            </div>
+            <div class="efield full">
+              <label>Estado Comercial</label>
+              <div class="estado-sel">
+                <button class="ebtn" data-e="disponible" onclick="setEstado('disponible')">✓ Disponible</button>
+                <button class="ebtn" data-e="vendido"    onclick="setEstado('vendido')">✕ Vendido</button>
+                <button class="ebtn" data-e="reservado"  onclick="setEstado('reservado')">⏳ Reservado</button>
+                <button class="ebtn" data-e="nodisponible" onclick="setEstado('nodisponible')">✗ No Disp.</button>
+              </div>
+            </div>
+            <div class="efield">
+              <label>Superficie (m²)</label>
+              <input type="text" id="f-dim" placeholder="Ej: 5000" oninput="liveUpdate()">
+            </div>
+            <div class="efield">
+              <label>Valor en UF</label>
+              <input type="number" id="f-uf" placeholder="Ej: 1500" min="0" oninput="liveUpdate()">
+            </div>
+            <div class="efield full" style="grid-column: span 2;">
+              <label>Hashtags y Características (#Etiquetas)</label>
+              <textarea id="f-caracteristicas" placeholder="Ej: #VistaAlMar, #Plano, #ArbolesNativos, #AguaEnEntrada, Terreno 100% plano..." oninput="liveUpdate()" style="width: 100%; min-height: 80px; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 13.5px; resize: vertical; outline: none; transition: border-color 0.2s;"></textarea>
+              <span class="brand-opt-hint" style="margin-top: 4px; display: block; font-size: 11px; color: var(--text-3);">Ingresa hashtags (ej: #VistaAlMar, #Plano, #ArbolesNativos) o cualidades de la parcela. Se mostrarán como etiquetas en las tarjetas informativas de los Smart Pins.</span>
+            </div>
+            <div class="clp-line">
+              <span>Valor estimado en CLP</span>
+              <strong id="f-clp">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="ecard">
+          <div class="ecard-title">
+            Galería de fotos
+            <span class="photo-count-badge" id="photo-count-badge">0 fotos</span>
+          </div>
+          <div class="photo-drop" id="photo-drop">
+            <input type="file" id="f-fotos" accept="image/jpeg,image/png,image/webp,image/heic,image/*" multiple>
+            <div class="photo-drop-ico">🖼️</div>
+            <div class="photo-drop-title">Arrastra fotos aquí o haz clic</div>
+            <div class="photo-drop-sub">JPG, PNG o WebP · máx. 6 fotos · se comprimen automáticamente<br>para la tarjeta del espectador</div>
+          </div>
+          <div class="photo-grid" id="photo-grid"></div>
+          <div class="photo-actions">
+            <button type="button" class="btn-photo-preview" id="btn-preview-gallery" onclick="previewGallery()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Previsualizar galería
+            </button>
+          </div>
+        </div>
+
+        <div class="save-wrap">
+          <button class="btn-save" id="btn-save" onclick="saveLote()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <div class="btn-spin"></div>
+            <span id="save-txt">Guardar Cambios</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <h2>Vista Espectador</h2>
+        <p>Preview en tiempo real</p>
+      </div>
+      <div class="preview-body">
+        <div class="pcard">
+          <div class="pcard-inner">
+            <div class="ppill disponible" id="p-pill">Disponible</div>
+            <div class="ptitle" id="p-title">Selecciona un lote</div>
+            <div class="prows">
+              <div class="prow"><span class="plabel">Superficie</span><span class="pval" id="p-area">— m²</span></div>
+              <div class="pdiv"></div>
+              <div class="prow"><span class="plabel">Valor UF</span><span class="pval" id="p-uf">— UF</span></div>
+              <div class="prow"><span class="plabel">Valor CLP</span><span class="pval clp" id="p-clp">—</span></div>
+            </div>
+            <div class="pdiv" id="p-caracteristicas-div" style="display: none; height: 1px; background: rgba(255,255,255,0.06); margin: 10px 0;"></div>
+            <div class="kpk-spec-tags-container" id="p-caracteristicas-tags-container" style="display: none; padding: 4px 16px 16px 16px;">
+              <!-- Se previsualizan los tags en tiempo real -->
+            </div>
+            <div class="pfoot">
+              <div class="pbtn foto" id="p-btn-foto" onclick="previewGallery()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Ver Fotos
+              </div>
+              <div class="pbtn wsp">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Contactar
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════
+   CONFIG — edita antes de subir a GitHub
+══════════════════════════════════════ */
+const CFG = {
+  GITHUB_OWNER: localStorage.getItem('ferrari_github_owner') || 'iLyCoNs',
+  GITHUB_REPO:  localStorage.getItem('ferrari_github_repo') || 'alercepatagon360',
+  DATA_PATH:    'data/datos.json',
+  BRAND_PATH:   'data/brand.json',
+  LOGO_DIR:     'assets/brand/logos',
+  BANNER_DIR:   'assets/brand/banners',
+  BRANCH:       'main',
+};
+
+/* ══ ESTADO ══ */
+let _sess = null, _lotes = [], _geo = null, _cid = null, _estado = 'disponible', _sha = null, _uf = 38000;
+let _backupSmartPins = null;
+try {
+  const cachedBackup = sessionStorage.getItem('ferrari360_backup_pins');
+  if (cachedBackup) _backupSmartPins = JSON.parse(cachedBackup);
+} catch(e) {}
+const CONTACT_DEFAULTS = {
+  whatsapp: '',
+  formEmail: '',
+  formEnabled: true,
+  platformCta: 'Consigue tu 360° aquí',
+  platformWhatsapp: '',
+  platformWeb: 'https://www.australdrone.cl',
+  platformLogo: 'https://raw.githubusercontent.com/iLyCoNs/austral-drones/refs/heads/main/logobanner.png',
+  platformName: 'Austral Drone'
+};
+let _adminSection = 'lotes';
+let _brand = { version: 2, projectName: '', logoPath: null, logoId: null, logos: [], font: 'cormorant', dockStyle: 'crystal', mobileSolid: true, hideLoteFill: false, contact: Object.assign({}, CONTACT_DEFAULTS), updatedAt: null };
+let _brandSha = null;
+let _logoPendingMap = {}; // id -> { base64, ext, mime, dataUrl }
+let _titleBannerPending = null; // { base64, dataUrl, ext, mime } | null
+let _titleBannerToDelete = null; // path string | null
+let _logosToDelete = []; // { path, sha? }
+let _brandFont = 'cormorant';
+let _brandStyle = 'crystal';
+
+const BRAND_FONTS = {
+  cormorant:  { family: "'Cormorant Garamond', Georgia, serif", weight: '600', tracking: '0.08em' },
+  cinzel:     { family: "'Cinzel', Georgia, serif", weight: '500', tracking: '0.14em' },
+  montserrat: { family: "'Montserrat', system-ui, sans-serif", weight: '600', tracking: '0.08em' },
+  josefin:    { family: "'Josefin Sans', system-ui, sans-serif", weight: '500', tracking: '0.1em' },
+  playfair:   { family: "'Playfair Display', Georgia, serif", weight: '600', tracking: '0.04em' },
+  outfit:     { family: "'Outfit', system-ui, sans-serif", weight: '500', tracking: '0.05em' }
+};
+const BRAND_STYLES = ['crystal', 'obsidian', 'ivory', 'graphite', 'champagne', 'obsidian-gold', 'bordeaux', 'platinum'];
+const BRAND_STYLE_LEGACY = {
+  'glass-pill': 'crystal', 'glass-bar': 'crystal', 'solid-light': 'ivory',
+  'night-glass': 'obsidian', 'gold-line': 'champagne'
+};
+
+
+/* ══ UF ══ */
+async function fetchUF() {
+  try {
+    const r = await fetch('https://mindicador.cl/api/uf');
+    if (r.ok) { const d = await r.json(); if (d?.serie?.length) _uf = d.serie[0].valor; }
+  } catch(e) {}
+}
+function fmtCLP(n) { return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP'}).format(n); }
+
+/* ══ LOGIN ══ */
+async function doLogin() {
+  const user = document.getElementById('li-user').value.trim();
+  const repo = document.getElementById('li-repo').value.trim();
+  const pat  = document.getElementById('li-pat').value.trim();
+  const err  = document.getElementById('li-err');
+  const btn  = document.getElementById('btn-login');
+  
+  err.textContent = '';
+  if (!user || !repo || !pat) { err.textContent = 'Completa usuario, repositorio y token.'; return; }
+  
+  btn.disabled = true; btn.textContent = 'Verificando…';
+  try {
+    const r = await fetch('https://api.github.com/user', {
+      headers: { Authorization: `token ${pat}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (!r.ok) throw new Error('Token GitHub inválido o sin permisos.');
+    const gh = await r.json();
+    
+    // Guardar credenciales para reconexión
+    localStorage.setItem('ferrari_github_owner', user);
+    localStorage.setItem('ferrari_github_repo', repo);
+    localStorage.setItem('ferrari_github_token', pat);
+
+    // Actualizar configuración en runtime
+    CFG.GITHUB_OWNER = user;
+    CFG.GITHUB_REPO = repo;
+
+    _sess = { token: pat, user: gh };
+    await enterApp();
+  } catch(e) {
+    err.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Ingresar al Panel';
+  }
+}
+
+/* ══ ENTER APP ══ */
+async function enterApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+  
+  const av = document.getElementById('usr-avatar');
+  document.getElementById('usr-label').textContent = _sess.user.login;
+  if (_sess.user.avatar_url) av.innerHTML = `<img src="${_sess.user.avatar_url}" alt="avatar">`;
+  else av.textContent = _sess.user.login.charAt(0).toUpperCase();
+  
+  await fetchUF();
+  await loadFromGitHub();
+  await loadBrandFromGitHub();
+  _bindPhotoUI();
+  _bindBrandUI();
+  _bindAdminNav();
+}
+
+/* ══ CARGAR DATOS ══ */
+async function loadFromGitHub(forceBypassCache = false) {
+  try {
+    const timestamp = forceBypassCache ? `?t=${Date.now()}` : '';
+    const url = `https://api.github.com/repos/${CFG.GITHUB_OWNER}/${CFG.GITHUB_REPO}/contents/${CFG.DATA_PATH}${timestamp}`;
+    const r = await fetch(url, { headers: { Authorization: `token ${_sess.token}`, Accept: 'application/vnd.github.v3+json' } });
+    if (r.status === 404) {
+      // Fallback: intentar data/lotes.json legacy
+      const legacyUrl = `https://api.github.com/repos/${CFG.GITHUB_OWNER}/${CFG.GITHUB_REPO}/contents/data/lotes.json${timestamp}`;
+      const r2 = await fetch(legacyUrl, { headers: { Authorization: `token ${_sess.token}`, Accept: 'application/vnd.github.v3+json' } });
+      if (r2.status === 404) { _lotes = []; _geo = null; _sha = null; showToast('Sin datos previos en GitHub. Agrega pines desde el visor primero.', 'info'); }
+      else if (!r2.ok) throw new Error('No se pudieron cargar datos del repositorio.');
+      else {
+        const d = await r2.json();
+        _sha = null; // será creación nueva al guardar en datos.json
+        _geo = null;
+        const jsonStr = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+        _lotes = JSON.parse(jsonStr);
+        console.log(`Cargados ${_lotes.length} lotes desde lotes.json (legacy)`);
+      }
+    }
+    else if (!r.ok) throw new Error('No se pudieron cargar datos del repositorio.');
+    else {
+      const d = await r.json();
+      _sha = d.sha;
+      const jsonStr = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+      const parsed = JSON.parse(jsonStr);
+      if (Array.isArray(parsed)) {
+        _lotes = parsed;
+        _geo = null;
+      } else {
+        _lotes = parsed.lotes || [];
+        _geo = parsed.geo || null;
+      }
+      console.log(`Cargados ${_lotes.length} lotes desde datos.json`);
+    }
+  } catch(e) { _lotes = []; _geo = null; showToast('Error cargando: ' + e.message, 'error'); }
+  renderSidebar();
+}
+
+async function refreshAdmin() {
+  const btn = document.getElementById('btn-refresh');
+  if (btn) btn.classList.add('spinning');
+  await loadFromGitHub(true);
+  await loadBrandFromGitHub();
+  if (btn) btn.classList.remove('spinning');
+  showToast('Datos recargados desde GitHub', 'success');
+}
+
+/* ══ TOGGLE SMART PINS ══ */
+function updateToggleButtonState() {
+  const btn = document.getElementById('btn-toggle-pins');
+  if (!btn) return;
+  
+  const anyHasPin = _lotes.some(l => l.hasSmartPin);
+  
+  if (anyHasPin) {
+    btn.textContent = 'Quitar todos';
+    btn.classList.remove('active');
+    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+    btn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    btn.style.color = 'var(--text-2)';
+  } else if (_backupSmartPins && _backupSmartPins.length > 0) {
+    btn.textContent = 'Restaurar';
+    btn.classList.add('active');
+    btn.style.background = 'rgba(52, 199, 89, 0.1)';
+    btn.style.borderColor = 'rgba(52, 199, 89, 0.3)';
+    btn.style.color = 'var(--green)';
+  } else {
+    btn.textContent = 'Quitar todos';
+    btn.classList.remove('active');
+    btn.style.background = 'rgba(255, 255, 255, 0.02)';
+    btn.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+    btn.style.color = 'var(--text-3)';
+  }
+}
+
+function toggleAllSmartPins() {
+  const anyHasPin = _lotes.some(l => l.hasSmartPin);
+  
+  if (anyHasPin) {
+    _backupSmartPins = _lotes.filter(l => l.hasSmartPin).map(l => l.id);
+    try {
+      sessionStorage.setItem('ferrari360_backup_pins', JSON.stringify(_backupSmartPins));
+    } catch(e) {}
+    
+    _lotes.forEach(l => {
+      l.hasSmartPin = false;
+    });
+    showToast('Todos los Smart Pins removidos de la lista temporal. Guarda para publicar.', 'info');
+  } else {
+    if (_backupSmartPins && _backupSmartPins.length > 0) {
+      _lotes.forEach(l => {
+        if (_backupSmartPins.includes(l.id)) {
+          l.hasSmartPin = true;
+        }
+      });
+      _backupSmartPins = null;
+      try {
+        sessionStorage.removeItem('ferrari360_backup_pins');
+      } catch(e) {}
+      showToast('Smart Pins restaurados en la lista temporal. Guarda para publicar.', 'success');
+    } else {
+      showToast('No hay pines en el respaldo para restaurar.', 'info');
+    }
+  }
+  
+  try { localStorage.setItem('ferrari360_lines', JSON.stringify(_lotes)); } catch (e) {}
+  
+  renderSidebar();
+  
+  if (_cid) {
+    const l = _lotes.find(x => x.id === _cid);
+    if (l) selectLote(l.id);
+  }
+  
+  liveUpdate();
+}
+
+/* ══ SIDEBAR ══ */
+function renderSidebar() {
+  updateToggleButtonState();
+  const list = document.getElementById('sb-list');
+  // Ahora filtramos cualquier elemento que tenga hasSmartPin, sin importar si es lote-libre, organico o franja
+  const pins = _lotes.filter(l => l.hasSmartPin);
+  document.getElementById('sb-count').textContent = `${pins.length} lote${pins.length!==1?'s':''}`;
+  if (!pins.length) {
+    list.innerHTML = '<div class="sidebar-empty"><div class="ei">📍</div><p>No hay lotes con Smart Pin.<br>Agrega pines desde el visor primero.</p></div>';
+    return;
+  }
+  list.innerHTML = '';
+  pins.forEach(l => {
+    const st = l.estado || 'disponible';
+    const div = document.createElement('div');
+    div.className = 'lote-item' + (_cid === l.id ? ' active' : '');
+    div.dataset.id = l.id;
+    div.innerHTML = `<div class="lote-dot ${st}"></div><div class="lote-item-info"><div class="lote-item-title">${l.titulo || 'Sin nombre'}</div><div class="lote-item-sub">${st.charAt(0).toUpperCase()+st.slice(1)}${l.dimensiones?' · '+l.dimensiones+' m²':''}${(l.fotos&&l.fotos.length)?' · 📷 '+l.fotos.length:''}</div></div>`;
+    div.addEventListener('click', () => selectLote(l.id));
+    list.appendChild(div);
+  });
+}
+
+/* ══ SELECCIONAR ══ */
+function selectLote(id) {
+  _cid = id;
+  if (typeof setAdminSection === 'function') setAdminSection('lotes');
+  const l = _lotes.find(x => x.id === id);
+  if (!l) return;
+  if (!Array.isArray(l.fotos)) l.fotos = [];
+  document.querySelectorAll('.lote-item').forEach(el => el.classList.toggle('active', el.dataset.id === id));
+  const ph = document.getElementById('ed-placeholder');
+  if (ph) { ph.hidden = true; ph.style.display = 'none'; }
+  const f = document.getElementById('ed-form');
+  if (f) { f.hidden = false; f.style.display = 'flex'; }
+  document.getElementById('f-titulo').value = l.titulo || '';
+  document.getElementById('f-dim').value    = l.dimensiones || '';
+  document.getElementById('f-uf').value     = l.valorUF || '';
+  const descEl = document.getElementById('f-caracteristicas');
+  if (descEl) {
+    const rawVal = l.hashtags ? (Array.isArray(l.hashtags) ? l.hashtags.join(', ') : l.hashtags) : (l.caracteristicas || '');
+    descEl.value = rawVal;
+  }
+  _estado = l.estado || 'disponible';
+  refreshEstadoBtns();
+  liveUpdate();
+  renderPhotoGrid();
+}
+
+function setEstado(e) { _estado = e; refreshEstadoBtns(); liveUpdate(); }
+function refreshEstadoBtns() {
+  document.querySelectorAll('.ebtn').forEach(b => {
+    b.className = 'ebtn' + (b.dataset.e === _estado ? ` sel-${_estado}` : '');
+  });
+}
+
+/* ══ FOTOS ══ */
+const MAX_FOTOS = 6;
+const MAX_PHOTO_W = 1400;
+const PHOTO_QUALITY = 0.72;
+
+function _currentFotos() {
+  const l = _lotes.find(x => x.id === _cid);
+  if (!l) return [];
+  if (!Array.isArray(l.fotos)) l.fotos = [];
+  return l.fotos;
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photo-grid');
+  const badge = document.getElementById('photo-count-badge');
+  const previewBtn = document.getElementById('p-btn-foto');
+  const fotos = _currentFotos();
+  if (badge) badge.textContent = `${fotos.length} foto${fotos.length !== 1 ? 's' : ''}`;
+  if (previewBtn) previewBtn.classList.toggle('is-empty', fotos.length === 0);
+
+  if (!grid) return;
+  if (!fotos.length) {
+    grid.innerHTML = '';
+    return;
+  }
+  grid.innerHTML = fotos.map((f, i) => `
+    <div class="photo-card">
+      <img src="${f.src}" alt="${(f.name || 'Foto ' + (i+1)).replace(/"/g,'')}">
+      <span class="photo-card-idx">${i + 1}</span>
+      <button type="button" class="photo-card-del" title="Eliminar" onclick="removeFoto('${f.id}')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function removeFoto(id) {
+  const l = _lotes.find(x => x.id === _cid);
+  if (!l || !Array.isArray(l.fotos)) return;
+  l.fotos = l.fotos.filter(f => f.id !== id);
+  renderPhotoGrid();
+  renderSidebar();
+  showToast('Foto eliminada (guarda para publicar)', 'info');
+}
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const scale = Math.min(1, MAX_PHOTO_W / img.width);
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        const src = canvas.toDataURL('image/jpeg', PHOTO_QUALITY);
+        URL.revokeObjectURL(url);
+        resolve({ src, w, h, name: file.name || 'foto.jpg' });
+      } catch (err) {
+        URL.revokeObjectURL(url);
+        reject(err);
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('No se pudo leer la imagen'));
+    };
+    img.src = url;
+  });
+}
+
+async function addFotosFromFiles(fileList) {
+  const l = _lotes.find(x => x.id === _cid);
+  if (!l) return;
+  if (!Array.isArray(l.fotos)) l.fotos = [];
+
+  const files = Array.from(fileList || []).filter(f => f.type.startsWith('image/'));
+  if (!files.length) {
+    showToast('Selecciona imágenes válidas', 'error');
+    return;
+  }
+
+  const room = MAX_FOTOS - l.fotos.length;
+  if (room <= 0) {
+    showToast(`Máximo ${MAX_FOTOS} fotos por lote`, 'error');
+    return;
+  }
+
+  const toProcess = files.slice(0, room);
+  showToast(`Procesando ${toProcess.length} foto${toProcess.length !== 1 ? 's' : ''}…`, 'info');
+
+  try {
+    for (const file of toProcess) {
+      const compressed = await compressImage(file);
+      l.fotos.push({
+        id: 'foto_' + Math.random().toString(36).slice(2, 10),
+        src: compressed.src,
+        name: compressed.name.replace(/\.[^.]+$/, ''),
+        w: compressed.w,
+        h: compressed.h
+      });
+    }
+    renderPhotoGrid();
+    renderSidebar();
+    if (files.length > room) {
+      showToast(`Se agregaron ${room}. Límite: ${MAX_FOTOS} fotos.`, 'info');
+    } else {
+      showToast(`✓ ${toProcess.length} foto${toProcess.length !== 1 ? 's' : ''} lista${toProcess.length !== 1 ? 's' : ''}. Guarda para publicar.`, 'success');
+    }
+  } catch (e) {
+    showToast('Error al procesar imagen: ' + e.message, 'error');
+  }
+}
+
+function previewGallery() {
+  if (!_cid) {
+    showToast('Selecciona un lote primero', 'info');
+    return;
+  }
+  const l = _lotes.find(x => x.id === _cid);
+  if (!l) return;
+  const fotos = Array.isArray(l.fotos) ? l.fotos : [];
+  if (!fotos.length) {
+    showToast('Este lote aún no tiene fotos. Súbelas arriba.', 'info');
+    return;
+  }
+  if (!window.FerrariGallery) {
+    showToast('Galería no cargada', 'error');
+    return;
+  }
+  window.FerrariGallery.open({
+    title: l.titulo || 'Galería del lote',
+    fotos
+  });
+}
+
+function _bindPhotoUI() {
+  const input = document.getElementById('f-fotos');
+  const drop = document.getElementById('photo-drop');
+  if (!input || !drop) return;
+
+  input.addEventListener('change', () => {
+    addFotosFromFiles(input.files);
+    input.value = '';
+  });
+
+  ['dragenter', 'dragover'].forEach(ev => {
+    drop.addEventListener(ev, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      drop.classList.add('is-drag');
+    });
+  });
+  ['dragleave', 'drop'].forEach(ev => {
+    drop.addEventListener(ev, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      drop.classList.remove('is-drag');
+    });
+  });
+  drop.addEventListener('drop', e => {
+    addFotosFromFiles(e.dataTransfer.files);
+  });
+}
+
+/* ══ IDENTIDAD / BRAND DOCK ══ */
+function _ghHeaders() {
+  return {
+    Authorization: `token ${_sess.token}`,
+    Accept: 'application/vnd.github.v3+json'
+  };
+}
+
+
+let _hoverColorSelected = 'neon-green';
+
+function setHoverColor(colorId) {
+  _hoverColorSelected = colorId;
+  const dots = document.querySelectorAll('.hcp-dot');
+  dots.forEach(dot => {
+    dot.classList.toggle('active', dot.getAttribute('data-color') === colorId);
+  });
+  liveBrandPreview();
+}
+
+
+
+
+
+function _obfuscateKey(key) {
+  if (!key) return '';
+  if (key.startsWith('kpk-enc-')) return key;
+  return 'kpk-enc-' + btoa(key.split('').reverse().join(''));
+}
+
+function _deobfuscateKey(encKey) {
+  if (!encKey) return '';
+  if (!encKey.startsWith('kpk-enc-')) return encKey;
+  try {
+    const rawBase = encKey.substring(8);
+    return atob(rawBase).split('').reverse().join('');
+  } catch (e) {
+    return encKey;
+  }
+}
+
+function _brandDefaults() {
+  return { version: 3, projectName: '', logoPath: null, logoId: null, logos: [], titleBannerPath: null, titleBannerHref: null, titleBannerScale: 100, font: 'cormorant', dockStyle: 'crystal', mobileSolid: true, hideLoteFill: false, loteFillOnHoverOnly: false, loteHoverColor: 'neon-green', contact: Object.assign({}, CONTACT_DEFAULTS), updatedAt: null };
+}
+
+function _clampBannerScale(n) {
+  const v = Number(n);
+  if (!isFinite(v)) return 100;
+  return Math.max(40, Math.min(220, Math.round(v)));
+}
+
+function _normalizeBrand(raw) {
+  const b = Object.assign(_brandDefaults(), raw || {});
+  if (BRAND_STYLE_LEGACY[b.dockStyle]) b.dockStyle = BRAND_STYLE_LEGACY[b.dockStyle];
+  if (!BRAND_FONTS[b.font]) b.font = 'cormorant';
+  if (BRAND_STYLES.indexOf(b.dockStyle) === -1) b.dockStyle = 'crystal';
+  if (!Array.isArray(b.logos)) b.logos = [];
+  if (b.mobileSolid == null) b.mobileSolid = true;
+  if (b.hideLoteFill == null) b.hideLoteFill = false;
+  if (b.loteFillOnHoverOnly == null) b.loteFillOnHoverOnly = false;
+  if (b.loteHoverColor == null) b.loteHoverColor = 'neon-green';
+  b.titleBannerScale = _clampBannerScale(b.titleBannerScale);
+  b.titleBannerHref = _normalizeBannerHref(b.titleBannerHref);
+  b.contact = Object.assign({}, CONTACT_DEFAULTS, (raw && raw.contact) || b.contact || {});
+  if (b.logoPath && !b.logoId && b.logos.length === 0) {
+    b.logoId = 'legacy';
+    b.logos = [{ id: 'legacy', path: b.logoPath, name: 'Logo principal', ext: (b.logoPath.split('.').pop() || 'png'), createdAt: b.updatedAt || Date.now() }];
+  }
+  if (b.logoId && b.logos.length) {
+    const hit = b.logos.find(l => l.id === b.logoId);
+    if (hit) b.logoPath = hit.path;
+  }
+  return b;
+}
+
+function _newLogoId() {
+  return 'logo_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+}
+
+function _activeLogo() {
+  if (!_brand.logoId || !Array.isArray(_brand.logos)) return null;
+  return _brand.logos.find(l => l.id === _brand.logoId) || null;
+}
+
+function _titleBannerSrc() {
+  if (_titleBannerPending && _titleBannerPending.dataUrl) return _titleBannerPending.dataUrl;
+  const path = _brand && _brand.titleBannerPath;
+  if (!path) return null;
+  const bust = _brand.updatedAt ? `?v=${encodeURIComponent(String(_brand.updatedAt))}` : '';
+  if (/^https?:\/\//i.test(path)) return path + bust;
+  return path + bust;
+}
+
+function _normalizeBannerHref(raw) {
+  let s = String(raw || '').trim();
+  if (!s) return null;
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  try {
+    const u = new URL(s);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+    return u.href;
+  } catch (e) {
+    return null;
+  }
+}
+
+function _readBannerHrefFromForm() {
+  const el = document.getElementById('brand-banner-href');
+  return _normalizeBannerHref(el ? el.value : (_brand && _brand.titleBannerHref));
+}
+
+function updateTitleBannerUI() {
+  const thumb = document.getElementById('brand-banner-thumb');
+  const nameEl = document.getElementById('brand-banner-name');
+  const hintEl = document.getElementById('brand-banner-hint');
+  const clearBtn = document.getElementById('btn-brand-banner-clear');
+  const src = _titleBannerSrc();
+  const path = (_titleBannerPending && 'Pendiente de publicar') || (_brand && _brand.titleBannerPath) || '';
+  if (thumb) {
+    thumb.innerHTML = src
+      ? `<img src="${src}" alt="Banner de título">`
+      : '<span class="ph">Sin banner</span>';
+  }
+  if (nameEl) nameEl.textContent = src ? (_titleBannerPending ? 'Nuevo banner PNG' : 'Banner activo') : 'Ningún banner';
+  if (hintEl) {
+    hintEl.textContent = src
+      ? (path || 'PNG transparente listo')
+      : 'Sube un PNG transparente';
+  }
+  if (clearBtn) clearBtn.style.display = src ? '' : 'none';
+}
+
+function _brandLogoSrc(brand) {
+  const active = _activeLogo();
+  if (active && _logoPendingMap[active.id] && _logoPendingMap[active.id].dataUrl) {
+    return _logoPendingMap[active.id].dataUrl;
+  }
+  if (!active || !active.path) return null;
+  const bust = brand && brand.updatedAt ? `?v=${encodeURIComponent(String(brand.updatedAt))}` : '';
+  if (/^https?:\/\//i.test(active.path)) return active.path + bust;
+  return active.path + bust;
+}
+
+function setBrandFont(font) {
+  if (!BRAND_FONTS[font]) return;
+  _brandFont = font;
+  document.querySelectorAll('.brand-font-btn').forEach(b => {
+    b.classList.toggle('is-on', b.dataset.font === font);
+  });
+  liveBrandPreview();
+}
+
+function setBrandStyle(style) {
+  if (BRAND_STYLES.indexOf(style) === -1) return;
+  _brandStyle = style;
+  document.querySelectorAll('.brand-style-btn').forEach(b => {
+    b.classList.toggle('is-on', b.dataset.style === style);
+  });
+  liveBrandPreview();
+}
+
+function selectBrandLogo(id) {
+  if (!_brand.logos.some(l => l.id === id)) return;
+  _brand.logoId = id;
+  const hit = _brand.logos.find(l => l.id === id);
+  _brand.logoPath = hit ? hit.path : null;
+  renderBrandGallery();
+  liveBrandPreview();
+}
+
+function renameBrandLogo(id) {
+  const logo = _brand.logos.find(l => l.id === id);
+  if (!logo) return;
+  const next = prompt('Nombre del logo:', logo.name || 'Logo');
+  if (next == null) return;
+  const name = String(next).trim().slice(0, 48);
+  if (!name) return;
+  logo.name = name;
+  renderBrandGallery();
+  liveBrandPreview();
+  showToast('Nombre actualizado. Publica para guardar.', 'info');
+}
+
+function deleteBrandLogo(id) {
+  const logo = _brand.logos.find(l => l.id === id);
+  if (!logo) return;
+  if (!confirm(`¿Eliminar "${logo.name || id}" de la galería?`)) return;
+  if (_logoPendingMap[id]) {
+    delete _logoPendingMap[id];
+  } else if (logo.path) {
+    _logosToDelete.push({ path: logo.path });
+  }
+  _brand.logos = _brand.logos.filter(l => l.id !== id);
+  if (_brand.logoId === id) {
+    const next = _brand.logos[0] || null;
+    _brand.logoId = next ? next.id : null;
+    _brand.logoPath = next ? next.path : null;
+  }
+  renderBrandGallery();
+  liveBrandPreview();
+  showToast('Logo marcado. Publica para aplicar en GitHub.', 'info');
+}
+
+function renderBrandGallery() {
+  const root = document.getElementById('brand-logo-gallery');
+  if (!root) return;
+  const logos = Array.isArray(_brand.logos) ? _brand.logos : [];
+  let htmlG = logos.map(logo => {
+    const pending = !!_logoPendingMap[logo.id];
+    const src = pending ? _logoPendingMap[logo.id].dataUrl : (logo.path || '');
+    const active = logo.id === _brand.logoId;
+    const bust = (!pending && _brand.updatedAt) ? `?v=${encodeURIComponent(String(_brand.updatedAt))}` : '';
+    return `<div class="brand-logo-card${active ? ' is-active' : ''}${pending ? ' is-pending' : ''}" data-id="${logo.id}" onclick="selectBrandLogo('${logo.id}')" title="Usar este logo">
+      <span class="brand-logo-card-name">${(logo.name || 'Logo').replace(/</g,'&lt;')}</span>
+      <img src="${src}${bust}" alt="" loading="lazy">
+      <div class="brand-logo-card-tools" onclick="event.stopPropagation()">
+        <button type="button" title="Renombrar" onclick="renameBrandLogo('${logo.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+        </button>
+        <button type="button" class="danger" title="Eliminar" onclick="deleteBrandLogo('${logo.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+  htmlG += `<label class="brand-logo-add" title="Subir logo a la galería">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    Subir
+    <input type="file" id="brand-logo-input" accept="image/*,.svg,image/svg+xml" multiple>
+  </label>`;
+  root.innerHTML = htmlG;
+  const input = document.getElementById('brand-logo-input');
+  if (input) {
+    input.addEventListener('change', () => {
+      onBrandLogoSelected(input.files);
+      input.value = '';
+    });
+  }
+
+  const active = _activeLogo();
+  const thumb = document.getElementById('brand-active-thumb');
+  const an = document.getElementById('brand-active-name');
+  const ah = document.getElementById('brand-active-hint');
+  if (thumb && an && ah) {
+    if (active) {
+      const src = _brandLogoSrc(_brand);
+      thumb.innerHTML = src ? `<img src="${src}" alt="">` : '<span class="ph">…</span>';
+      an.textContent = active.name || 'Logo activo';
+      ah.textContent = pendingLabel(active) + (active.path ? active.path : 'pendiente de publicar');
+    } else {
+      thumb.innerHTML = '<span class="ph">Sin logo</span>';
+      an.textContent = 'Ningún logo activo';
+      ah.textContent = 'Sube uno o selecciona de la galería';
+    }
+  }
+}
+
+function pendingLabel(logo) {
+  return _logoPendingMap[logo.id] ? 'Nuevo · ' : '';
+}
+
+function onBannerScaleInput() {
+  const el = document.getElementById('brand-banner-scale');
+  const val = document.getElementById('brand-banner-scale-val');
+  const pct = _clampBannerScale(el ? el.value : 100);
+  if (el) el.value = String(pct);
+  if (val) val.textContent = pct + '%';
+  _brand.titleBannerScale = pct;
+  liveBrandPreview();
+}
+
+function liveBrandPreview() {
+  const name = (document.getElementById('brand-name').value || '').trim();
+  const src = _brandLogoSrc(_brand);
+  const bannerSrc = _titleBannerSrc();
+  const dock = document.getElementById('kpk-brand-dock');
+  const glass = dock && dock.querySelector('.kpk-brand-dock__glass');
+  const dockName = document.getElementById('kpk-brand-name');
+  const dockLogo = document.getElementById('kpk-brand-logo');
+  const dockLogoWrap = document.getElementById('kpk-brand-logo-wrap');
+  const dockBanner = document.getElementById('kpk-brand-title-banner');
+  const dockBannerLink = document.getElementById('kpk-brand-title-banner-link');
+  const previewEmpty = document.getElementById('brand-preview-empty');
+  const fontMeta = BRAND_FONTS[_brandFont] || BRAND_FONTS.cormorant;
+  const mobileSolidEl = document.getElementById('brand-mobile-solid');
+  const mobileSolid = mobileSolidEl ? !!mobileSolidEl.checked : true;
+  const bannerHref = _readBannerHrefFromForm();
+  const hasBanner = !!bannerSrc;
+  const hasName = name.length > 0;
+  const hasLogo = !!src;
+
+  updateTitleBannerUI();
+
+  // sync active row thumb
+  const active = _activeLogo();
+  const thumb = document.getElementById('brand-active-thumb');
+  const an = document.getElementById('brand-active-name');
+  const ah = document.getElementById('brand-active-hint');
+  if (thumb && an && ah) {
+    if (active) {
+      thumb.innerHTML = src ? `<img src="${src}" alt="">` : '<span class="ph">…</span>';
+      an.textContent = active.name || 'Logo activo';
+      ah.textContent = pendingLabel(active) + (active.path || 'pendiente de publicar');
+    }
+  }
+
+  if (!dock) return;
+
+  BRAND_STYLES.forEach(s => dock.classList.remove('dock-style-' + s));
+  ['glass-pill','glass-bar','solid-light','night-glass','gold-line'].forEach(s => dock.classList.remove('dock-style-' + s));
+  dock.classList.add('dock-style-' + _brandStyle);
+  // En admin: solid solo si la preferencia está ON y se previsualiza como móvil (viewport admin estrecho)
+  const previewMobile = window.matchMedia('(max-width: 768px)').matches;
+  dock.classList.toggle('is-mobile-solid', mobileSolid && previewMobile);
+
+  if (glass) {
+    glass.style.setProperty('--brand-font', fontMeta.family);
+    glass.style.setProperty('--brand-tracking', fontMeta.tracking);
+    glass.style.setProperty('--brand-weight', fontMeta.weight);
+  }
+  if (dockBanner) {
+    if (hasBanner) {
+      dockBanner.onerror = () => {
+        dockBanner.hidden = true;
+        dockBanner.removeAttribute('src');
+        dock.classList.remove('has-title-banner');
+        if (dockBannerLink) {
+          dockBannerLink.hidden = true;
+          dockBannerLink.classList.remove('is-linked');
+          dockBannerLink.removeAttribute('href');
+        }
+      };
+      dockBanner.src = bannerSrc;
+      dockBanner.alt = hasName ? name : 'Banner del proyecto';
+      dockBanner.hidden = false;
+    } else {
+      dockBanner.hidden = true;
+      dockBanner.removeAttribute('src');
+    }
+  }
+  if (dockBannerLink) {
+    if (hasBanner) {
+      dockBannerLink.hidden = false;
+      if (bannerHref) {
+        dockBannerLink.href = bannerHref;
+        dockBannerLink.target = '_blank';
+        dockBannerLink.rel = 'noopener noreferrer';
+        dockBannerLink.classList.add('is-linked');
+        dockBannerLink.setAttribute('tabindex', '0');
+        dockBannerLink.setAttribute('aria-label', (hasName ? name + ' — ' : '') + 'Abrir sitio web oficial');
+      } else {
+        dockBannerLink.removeAttribute('href');
+        dockBannerLink.removeAttribute('target');
+        dockBannerLink.removeAttribute('rel');
+        dockBannerLink.classList.remove('is-linked');
+        dockBannerLink.setAttribute('tabindex', '-1');
+        dockBannerLink.removeAttribute('aria-label');
+      }
+    } else {
+      dockBannerLink.hidden = true;
+      dockBannerLink.classList.remove('is-linked');
+      dockBannerLink.removeAttribute('href');
+      dockBannerLink.removeAttribute('target');
+      dockBannerLink.removeAttribute('rel');
+      dockBannerLink.setAttribute('tabindex', '-1');
+      dockBannerLink.removeAttribute('aria-label');
+    }
+  }
+  if (dockName) {
+    dockName.style.fontFamily = fontMeta.family;
+    dockName.style.fontWeight = fontMeta.weight;
+    dockName.style.letterSpacing = fontMeta.tracking;
+    dockName.textContent = hasName ? name : '';
+    dockName.hidden = hasBanner || !hasName;
+  }
+
+  if (dockLogo && dockLogoWrap) {
+    if (hasLogo && !hasBanner) {
+      dockLogo.onerror = () => {
+        dockLogoWrap.hidden = true;
+        dock.classList.remove('has-logo');
+      };
+      dockLogo.src = src;
+      dockLogo.alt = hasName ? name : 'Logo';
+      dockLogoWrap.hidden = false;
+    } else {
+      dockLogo.removeAttribute('src');
+      dockLogoWrap.hidden = true;
+    }
+  }
+
+  dock.classList.toggle('has-title-banner', hasBanner);
+  dock.classList.toggle('has-logo', hasLogo && !hasBanner);
+  dock.classList.toggle('has-name', hasName && !hasBanner);
+
+  const scaleEl = document.getElementById('brand-banner-scale');
+  const scaleVal = document.getElementById('brand-banner-scale-val');
+  const scalePct = _clampBannerScale(scaleEl ? scaleEl.value : (_brand.titleBannerScale || 100));
+  _brand.titleBannerScale = scalePct;
+  if (scaleEl && String(scaleEl.value) !== String(scalePct)) scaleEl.value = String(scalePct);
+  if (scaleVal) scaleVal.textContent = scalePct + '%';
+  dock.style.setProperty('--kpk-banner-scale', String(scalePct / 100));
+
+  if (hasName || hasLogo || hasBanner) {
+    dock.hidden = false;
+    dock.classList.add('is-visible');
+    dock.setAttribute('aria-hidden', 'false');
+    if (previewEmpty) previewEmpty.hidden = true;
+  } else {
+    dock.hidden = true;
+    dock.classList.remove('is-visible', 'has-title-banner');
+    dock.setAttribute('aria-hidden', 'true');
+    if (previewEmpty) previewEmpty.hidden = false;
+  }
+  const hideLoteFillEl = document.getElementById('brand-hide-lote-fill');
+  const hideLoteFill = hideLoteFillEl ? !!hideLoteFillEl.checked : false;
+  document.body.classList.toggle('kpk-hide-lote-fill', hideLoteFill);
+
+  const hoverOnlyEl = document.getElementById('brand-lote-fill-hover-only');
+  const hoverOnly = hoverOnlyEl ? !!hoverOnlyEl.checked : false;
+  document.body.classList.toggle('kpk-lote-fill-hover-only', hoverOnly);
+
+  const colorContainer = document.getElementById('brand-hover-color-container');
+  if (colorContainer) {
+    colorContainer.style.display = hoverOnly ? 'block' : 'none';
+  }
+
+  const HOVER_COLORS = {
+    'neon-green':  'rgba(57, 255, 20, 0.35)',
+    'neon-blue':   'rgba(0, 229, 255, 0.35)',
+    'neon-pink':   'rgba(255, 0, 127, 0.35)',
+    'neon-orange': 'rgba(255, 145, 0, 0.35)',
+    'glass-white': 'rgba(255, 255, 255, 0.22)'
+  };
+  if (hoverOnly) {
+    const colorVal = HOVER_COLORS[_hoverColorSelected] || HOVER_COLORS['neon-green'];
+    document.body.style.setProperty('--kpk-lote-hover-fill', colorVal);
+  } else {
+    document.body.style.removeProperty('--kpk-lote-hover-fill');
+  }
+}
+
+function clearBrandLogo() {
+  if (_brand.logoId) deleteBrandLogo(_brand.logoId);
+}
+
+function _extFromFile(file) {
+  const name = (file.name || '').toLowerCase();
+  const m = name.match(/\.([a-z0-9]+)$/);
+  if (m) {
+    const e = m[1];
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp', 'avif', 'heic', 'tif', 'tiff'].includes(e)) {
+      return e === 'jpeg' ? 'jpg' : e;
+    }
+  }
+  const map = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+    'image/svg+xml': 'svg',
+    'image/bmp': 'bmp',
+    'image/avif': 'avif'
+  };
+  return map[file.type] || 'png';
+}
+
+function _fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result || '');
+      const comma = dataUrl.indexOf(',');
+      if (comma < 0) return reject(new Error('No se pudo leer el archivo'));
+      resolve({ dataUrl, base64: dataUrl.slice(comma + 1) });
+    };
+    reader.onerror = () => reject(new Error('Error leyendo el archivo'));
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Comprime raster a PNG premium (máx 512px) preservando transparencia. SVG/GIF se suben tal cual. */
+async function prepareBrandLogo(file) {
+  const ext = _extFromFile(file);
+  if (ext === 'svg' || ext === 'gif') {
+    const raw = await _fileToBase64(file);
+    return {
+      base64: raw.base64,
+      dataUrl: raw.dataUrl,
+      ext,
+      mime: file.type || (ext === 'svg' ? 'image/svg+xml' : 'image/gif')
+    };
+  }
+
+  try {
+    const url = URL.createObjectURL(file);
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('Formato no soportado en el navegador'));
+      i.src = url;
+    });
+    const max = 512;
+    const scale = Math.min(1, max / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+    const dataUrl = canvas.toDataURL('image/png');
+    return {
+      base64: dataUrl.slice(dataUrl.indexOf(',') + 1),
+      dataUrl,
+      ext: 'png',
+      mime: 'image/png'
+    };
+  } catch (e) {
+    const raw = await _fileToBase64(file);
+    return {
+      base64: raw.base64,
+      dataUrl: raw.dataUrl,
+      ext,
+      mime: file.type || 'application/octet-stream'
+    };
+  }
+}
+
+async function onBrandLogoSelected(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+  let added = 0;
+  for (const file of files) {
+    const isImage = file.type.startsWith('image/') || /\.svg$/i.test(file.name);
+    if (!isImage) {
+      showToast('Archivo ignorado (no es imagen): ' + file.name, 'error');
+      continue;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      showToast('Logo demasiado pesado (>12 MB): ' + file.name, 'error');
+      continue;
+    }
+    try {
+      const prepared = await prepareBrandLogo(file);
+      const id = _newLogoId();
+      const baseName = (file.name || 'logo').replace(/\.[^.]+$/, '').slice(0, 40) || 'Logo';
+      const entry = {
+        id,
+        name: baseName,
+        path: `${CFG.LOGO_DIR}/${id}.${prepared.ext}`,
+        ext: prepared.ext,
+        createdAt: Date.now()
+      };
+      _logoPendingMap[id] = prepared;
+      if (!Array.isArray(_brand.logos)) _brand.logos = [];
+      _brand.logos.push(entry);
+      _brand.logoId = id;
+      _brand.logoPath = entry.path;
+      added++;
+    } catch (e) {
+      showToast('Error con ' + file.name + ': ' + e.message, 'error');
+    }
+  }
+  if (added) {
+    renderBrandGallery();
+    liveBrandPreview();
+    showToast(added === 1 ? '✓ Logo listo. Publica para subirlo a GitHub.' : `✓ ${added} logos listos. Publica para subirlos.`, 'success');
+  }
+}
+
+/** Banner de título: PNG ancho con alpha (máx ~1600px de ancho). */
+async function prepareTitleBanner(file) {
+  const ext = _extFromFile(file);
+  if (ext !== 'png' && file.type !== 'image/png') {
+    throw new Error('Solo se acepta PNG transparente');
+  }
+  try {
+    const url = URL.createObjectURL(file);
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('No se pudo leer el PNG'));
+      i.src = url;
+    });
+    const maxW = 1600;
+    const scale = Math.min(1, maxW / Math.max(1, img.width));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+    const dataUrl = canvas.toDataURL('image/png');
+    return {
+      base64: dataUrl.slice(dataUrl.indexOf(',') + 1),
+      dataUrl,
+      ext: 'png',
+      mime: 'image/png'
+    };
+  } catch (e) {
+    const raw = await _fileToBase64(file);
+    return {
+      base64: raw.base64,
+      dataUrl: raw.dataUrl,
+      ext: 'png',
+      mime: 'image/png'
+    };
+  }
+}
+
+async function onTitleBannerSelected(fileList) {
+  const file = fileList && fileList[0];
+  if (!file) return;
+  const isPng = file.type === 'image/png' || /\.png$/i.test(file.name || '');
+  if (!isPng) {
+    showToast('El banner debe ser PNG transparente', 'error');
+    return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    showToast('Banner demasiado pesado (>8 MB)', 'error');
+    return;
+  }
+  try {
+    const prepared = await prepareTitleBanner(file);
+    // Si había un banner publicado distinto, marcarlo para borrar al publicar
+    if (_brand.titleBannerPath && !_titleBannerPending) {
+      _titleBannerToDelete = _brand.titleBannerPath;
+    }
+    _titleBannerPending = prepared;
+    _brand.titleBannerPath = `${CFG.BANNER_DIR}/title_${Date.now().toString(36)}.png`;
+    liveBrandPreview();
+    showToast('✓ Banner listo. Publica identidad para subirlo al tour 360°.', 'success');
+  } catch (e) {
+    showToast('Error con el banner: ' + e.message, 'error');
+  }
+  const input = document.getElementById('brand-banner-input');
+  if (input) input.value = '';
+}
+
+function clearTitleBanner() {
+  // Si solo había un pendiente que reemplazaba un publicado, conservar el path a borrar.
+  // Si el actual ya estaba publicado (sin pending), marcar ese path.
+  if (!_titleBannerPending && _brand.titleBannerPath) {
+    _titleBannerToDelete = _brand.titleBannerPath;
+  }
+  _titleBannerPending = null;
+  _brand.titleBannerPath = null;
+  liveBrandPreview();
+  showToast('Banner quitado. Publica para aplicar en el tour.', 'success');
+}
+
+function _bindBrandUI() {
+  document.getElementById('brand-font-grid')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.brand-font-btn');
+    if (btn) setBrandFont(btn.dataset.font);
+  });
+  document.getElementById('brand-style-grid')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.brand-style-btn');
+    if (btn) setBrandStyle(btn.dataset.style);
+  });
+  const bannerInput = document.getElementById('brand-banner-input');
+  if (bannerInput && !bannerInput._kpkBound) {
+    bannerInput._kpkBound = true;
+    bannerInput.addEventListener('change', () => onTitleBannerSelected(bannerInput.files));
+  }
+  renderBrandGallery();
+}
+
+async function _getFileMeta(path) {
+  const url = `https://api.github.com/repos/${CFG.GITHUB_OWNER}/${CFG.GITHUB_REPO}/contents/${path}`;
+  const r = await fetch(url, { headers: _ghHeaders() });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error('No se pudo leer ' + path);
+  return await r.json();
+}
+
+async function loadBrandFromGitHub() {
+  try {
+    const meta = await _getFileMeta(CFG.BRAND_PATH);
+    if (!meta) {
+      _brand = _brandDefaults();
+      _brandSha = null;
+    } else {
+      _brandSha = meta.sha;
+      const jsonStr = decodeURIComponent(escape(atob(meta.content.replace(/\n/g, ''))));
+      _brand = _normalizeBrand(JSON.parse(jsonStr));
+    }
+    _logoPendingMap = {};
+    _logosToDelete = [];
+    _titleBannerPending = null;
+    _titleBannerToDelete = null;
+  } catch (e) {
+    showToast('Error cargando identidad: ' + e.message, 'error');
+  }
+  const nameEl = document.getElementById('brand-name');
+  if (nameEl) nameEl.value = _brand.projectName || '';
+  const bannerHrefEl = document.getElementById('brand-banner-href');
+  if (bannerHrefEl) bannerHrefEl.value = _brand.titleBannerHref || '';
+  const bannerScaleEl = document.getElementById('brand-banner-scale');
+  const bannerScaleVal = document.getElementById('brand-banner-scale-val');
+  const bannerScale = _clampBannerScale(_brand.titleBannerScale);
+  _brand.titleBannerScale = bannerScale;
+  if (bannerScaleEl) bannerScaleEl.value = String(bannerScale);
+  if (bannerScaleVal) bannerScaleVal.textContent = bannerScale + '%';
+  const solidEl = document.getElementById('brand-mobile-solid');
+  if (solidEl) solidEl.checked = _brand.mobileSolid !== false;
+  const hideFillEl = document.getElementById('brand-hide-lote-fill');
+  if (hideFillEl) hideFillEl.checked = _brand.hideLoteFill === true;
+  const hoverOnlyEl = document.getElementById('brand-lote-fill-hover-only');
+  if (hoverOnlyEl) hoverOnlyEl.checked = _brand.loteFillOnHoverOnly === true;
+
+  _hoverColorSelected = _brand.loteHoverColor || 'neon-green';
+  const dots = document.querySelectorAll('.hcp-dot');
+  dots.forEach(dot => {
+    dot.classList.toggle('active', dot.getAttribute('data-color') === _hoverColorSelected);
+  });
+
+  _brandFont = BRAND_FONTS[_brand.font] ? _brand.font : 'cormorant';
+  _brandStyle = BRAND_STYLES.indexOf(_brand.dockStyle) !== -1 ? _brand.dockStyle : 'crystal';
+  setBrandFont(_brandFont);
+  setBrandStyle(_brandStyle);
+  _fillContactForm(_brand.contact);
+  renderBrandGallery();
+  liveBrandPreview();
+}
+
+async function _putGitHubFile(path, base64Content, message, sha) {
+  const url = `https://api.github.com/repos/${CFG.GITHUB_OWNER}/${CFG.GITHUB_REPO}/contents/${path}`;
+  const body = { message, content: base64Content, branch: CFG.BRANCH };
+  if (sha) body.sha = sha;
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: { ..._ghHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.message || ('Error al subir ' + path));
+  }
+  return await r.json();
+}
+
+async function _deleteGitHubFile(path, sha, message) {
+  if (!path) return;
+  let fileSha = sha;
+  if (!fileSha) {
+    const meta = await _getFileMeta(path);
+    if (!meta) return;
+    fileSha = meta.sha;
+  }
+  const url = `https://api.github.com/repos/${CFG.GITHUB_OWNER}/${CFG.GITHUB_REPO}/contents/${path}`;
+  const r = await fetch(url, {
+    method: 'DELETE',
+    headers: { ..._ghHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, sha: fileSha, branch: CFG.BRANCH })
+  });
+  if (!r.ok && r.status !== 404) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.message || ('Error al eliminar ' + path));
+  }
+}
+
+async function saveBrand() {
+  if (!_sess) {
+    showToast('Inicia sesión para publicar en GitHub', 'error');
+    return;
+  }
+  const btn = document.getElementById('btn-brand-save');
+  const txt = document.getElementById('brand-save-txt');
+  const oldTxt = txt ? txt.textContent : 'Publicar';
+  if (btn) btn.disabled = true;
+  if (txt) txt.textContent = 'Publicando…';
+
+  try {
+    const projectName = (document.getElementById('brand-name').value || '').trim();
+    const mobileSolid = document.getElementById('brand-mobile-solid')
+      ? !!document.getElementById('brand-mobile-solid').checked
+      : true;
+    const hideLoteFill = document.getElementById('brand-hide-lote-fill')
+      ? !!document.getElementById('brand-hide-lote-fill').checked
+      : false;
+    const loteFillOnHoverOnly = document.getElementById('brand-lote-fill-hover-only')
+      ? !!document.getElementById('brand-lote-fill-hover-only').checked
+      : false;
+    const stamp = Date.now();
+
+    // 1) Subir logos pendientes
+    for (const logo of _brand.logos) {
+      const pending = _logoPendingMap[logo.id];
+      if (!pending) continue;
+      const logoPath = `${CFG.LOGO_DIR}/${logo.id}.${pending.ext}`;
+      logo.path = logoPath;
+      logo.ext = pending.ext;
+      const existing = await _getFileMeta(logoPath);
+      await _putGitHubFile(
+        logoPath,
+        pending.base64,
+        `Admin: logo galería — ${logo.name || logo.id}`,
+        existing ? existing.sha : null
+      );
+      delete _logoPendingMap[logo.id];
+    }
+
+    // 2) Eliminar logos marcados
+    for (const del of _logosToDelete) {
+      await _deleteGitHubFile(del.path, del.sha, 'Admin: elimina logo de galería');
+    }
+    _logosToDelete = [];
+
+    // 3) Banner de título PNG
+    let titleBannerPath = _brand.titleBannerPath || null;
+    if (_titleBannerPending) {
+      titleBannerPath = `${CFG.BANNER_DIR}/title_${stamp.toString(36)}.png`;
+      const existingBanner = await _getFileMeta(titleBannerPath);
+      await _putGitHubFile(
+        titleBannerPath,
+        _titleBannerPending.base64,
+        'Admin: banner de título del dock',
+        existingBanner ? existingBanner.sha : null
+      );
+      _titleBannerPending = null;
+    }
+    if (_titleBannerToDelete && _titleBannerToDelete !== titleBannerPath) {
+      await _deleteGitHubFile(_titleBannerToDelete, null, 'Admin: elimina banner de título anterior');
+    }
+    _titleBannerToDelete = null;
+    if (!titleBannerPath) {
+      // limpiar si el admin quitó el banner
+      titleBannerPath = null;
+    }
+
+    const active = _activeLogo();
+    _brand = {
+      version: 3,
+      projectName,
+      logoPath: active ? active.path : null,
+      logoId: active ? active.id : null,
+      logos: _brand.logos.map(l => ({
+        id: l.id,
+        name: l.name || 'Logo',
+        path: l.path,
+        ext: l.ext || (l.path && l.path.split('.').pop()) || 'png',
+        createdAt: l.createdAt || stamp
+      })),
+      titleBannerPath,
+      titleBannerHref: titleBannerPath ? _readBannerHrefFromForm() : null,
+      titleBannerScale: titleBannerPath
+        ? _clampBannerScale(
+            document.getElementById('brand-banner-scale')
+              ? document.getElementById('brand-banner-scale').value
+              : _brand.titleBannerScale
+          )
+        : 100,
+      font: _brandFont,
+      dockStyle: _brandStyle,
+      mobileSolid,
+      hideLoteFill,
+      loteFillOnHoverOnly,
+      loteHoverColor: _hoverColorSelected,
+      contact: _readContactFromForm(),
+      updatedAt: stamp
+    };
+
+    const brandB64 = btoa(unescape(encodeURIComponent(JSON.stringify(_brand, null, 2))));
+    const brandMeta = await _getFileMeta(CFG.BRAND_PATH);
+    const putBrand = await _putGitHubFile(
+      CFG.BRAND_PATH,
+      brandB64,
+      `Admin: identidad del proyecto — ${projectName || 'vacío'}`,
+      brandMeta ? brandMeta.sha : _brandSha
+    );
+    _brandSha = putBrand.content && putBrand.content.sha ? putBrand.content.sha : _brandSha;
+
+    try {
+      localStorage.setItem('ferrari360_brand', JSON.stringify(_brand));
+      if (_brand.voiceMode) {
+        localStorage.setItem('kpk_voice_mode', _brand.voiceMode);
+        localStorage.removeItem('kpk_voice_user_override');
+      }
+      localStorage.setItem('kpk_tts_output', _brand.ttsOutputEnabled ? '1' : '0');
+      syncCopilotTtsOutputUI();
+      // Nueva key / créditos: invalidar sondeo ElevenLabs
+      localStorage.removeItem('kpk_el_status_v1');
+    } catch (e) {}
+
+    renderBrandGallery();
+    liveBrandPreview();
+    showToast('✓ Identidad y galería publicadas en GitHub', 'success');
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    if (txt) txt.textContent = oldTxt;
+    if (btn) btn.disabled = false;
+  }
+}
+
+function setAdminSection(sec) {
+  _adminSection = sec || 'lotes';
+  document.querySelectorAll('.sidebar-nav-btn').forEach(b => {
+    b.classList.toggle('is-on', b.dataset.section === _adminSection);
+  });
+  const lotesWrap = document.getElementById('sidebar-lotes-wrap');
+  if (lotesWrap) lotesWrap.hidden = _adminSection !== 'lotes';
+
+  document.querySelectorAll('[data-admin-section]').forEach(el => {
+    const match = el.dataset.adminSection === _adminSection;
+    if (el.id === 'ed-form') {
+      if (_adminSection !== 'lotes') el.style.display = 'none';
+      else if (_cid) el.style.display = 'flex';
+      return;
+    }
+    if (el.id === 'ed-placeholder') {
+      el.hidden = !(_adminSection === 'lotes' && !_cid);
+      return;
+    }
+    el.hidden = !match;
+  });
+
+  if (_adminSection === 'contacto') liveContactPreview();
+  if (_adminSection === 'identidad') liveBrandPreview();
+}
+
+function _readContactFromForm() {
+  return {
+    whatsapp: (document.getElementById('contact-whatsapp') && document.getElementById('contact-whatsapp').value || '').trim(),
+    formEmail: (document.getElementById('contact-form-email') && document.getElementById('contact-form-email').value || '').trim(),
+    formEnabled: document.getElementById('contact-form-enabled') ? !!document.getElementById('contact-form-enabled').checked : true,
+    platformCta: (document.getElementById('contact-platform-cta') && document.getElementById('contact-platform-cta').value || '').trim() || CONTACT_DEFAULTS.platformCta,
+    platformWhatsapp: (document.getElementById('contact-platform-wa') && document.getElementById('contact-platform-wa').value || '').trim(),
+    platformWeb: (document.getElementById('contact-platform-web') && document.getElementById('contact-platform-web').value || '').trim() || CONTACT_DEFAULTS.platformWeb,
+    platformLogo: (document.getElementById('contact-platform-logo') && document.getElementById('contact-platform-logo').value || '').trim() || CONTACT_DEFAULTS.platformLogo,
+    platformName: (document.getElementById('contact-platform-name') && document.getElementById('contact-platform-name').value || '').trim() || CONTACT_DEFAULTS.platformName,
+    
+    // Alertas de WhatsApp (ofuscadas para el JSON de GitHub)
+    waAlertsEnabled: document.getElementById('contact-wa-alerts-enabled') ? !!document.getElementById('contact-wa-alerts-enabled').checked : false,
+    waAlertsPhone: (document.getElementById('contact-wa-alerts-phone') && document.getElementById('contact-wa-alerts-phone').value || '').trim(),
+    waAlertsKey: _obfuscateKey((document.getElementById('contact-wa-alerts-key') && document.getElementById('contact-wa-alerts-key').value || '').trim())
+  };
+}
+
+function _fillContactForm(contact) {
+  const c = Object.assign({}, CONTACT_DEFAULTS, contact || {});
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v == null ? '' : v; };
+  set('contact-whatsapp', c.whatsapp);
+  set('contact-form-email', c.formEmail);
+  const en = document.getElementById('contact-form-enabled');
+  if (en) en.checked = c.formEnabled !== false;
+  
+  // Alertas de WhatsApp
+  const waEn = document.getElementById('contact-wa-alerts-enabled');
+  if (waEn) waEn.checked = !!c.waAlertsEnabled;
+  set('contact-wa-alerts-phone', c.waAlertsPhone || '');
+  set('contact-wa-alerts-key', _deobfuscateKey(c.waAlertsKey || ''));
+
+  set('contact-platform-cta', c.platformCta);
+  set('contact-platform-wa', c.platformWhatsapp);
+  set('contact-platform-web', c.platformWeb);
+  set('contact-platform-logo', c.platformLogo);
+  set('contact-platform-name', c.platformName);
+  liveContactPreview();
+}
+
+function liveContactPreview() {
+  const c = _readContactFromForm();
+  const logo = document.getElementById('contact-preview-logo');
+  const name = document.getElementById('contact-preview-name');
+  const cta = document.getElementById('contact-preview-cta');
+  const web = document.getElementById('contact-preview-web');
+  const wa = document.getElementById('contact-preview-wa');
+  if (name) name.textContent = c.platformName;
+  if (cta) cta.textContent = c.platformCta;
+  if (web) web.textContent = String(c.platformWeb || '').replace(/^https?:\/\//i, '');
+  if (wa) wa.textContent = c.platformWhatsapp ? ('WA ' + c.platformWhatsapp) : 'WhatsApp (sin numero)';
+  if (logo) {
+    if (c.platformLogo) { logo.src = c.platformLogo; logo.hidden = false; }
+    else logo.hidden = true;
+  }
+}
+
+function _bindAdminNav() {
+  const nav = document.getElementById('sidebar-nav');
+  if (nav) {
+    nav.addEventListener('click', (e) => {
+      const btn = e.target.closest('.sidebar-nav-btn');
+      if (!btn) return;
+      setAdminSection(btn.dataset.section);
+    });
+  }
+  ['contact-platform-cta','contact-platform-name','contact-platform-web','contact-platform-logo','contact-platform-wa','contact-whatsapp','contact-form-email']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', liveContactPreview);
+    });
+  const en = document.getElementById('contact-form-enabled');
+  if (en) en.addEventListener('change', liveContactPreview);
+
+  // Plataforma 360: solo con ALT+X (sesión). Sin password en el código fuente.
+  const plat = document.getElementById('contact-platform-lock');
+  if (plat) {
+    const unlocked = sessionStorage.getItem('kpk_platform_unlock') === '1';
+    plat.hidden = !unlocked;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (!(e.altKey && (e.key === 'x' || e.key === 'X'))) return;
+    const section = document.getElementById('contact-card');
+    if (!section || section.hidden) return;
+    e.preventDefault();
+    const box = document.getElementById('contact-platform-lock');
+    if (!box) return;
+    const next = box.hidden;
+    box.hidden = !next;
+    try {
+      if (next) sessionStorage.setItem('kpk_platform_unlock', '1');
+      else sessionStorage.removeItem('kpk_platform_unlock');
+    } catch (err) {}
+    if (next) liveContactPreview();
+    if (typeof showToast === 'function') {
+      showToast(next ? 'Sección Plataforma visible (ALT+X)' : 'Sección Plataforma ocultada', 'info');
+    }
+  });
+
+  const btnTogglePins = document.getElementById('btn-toggle-pins');
+  if (btnTogglePins) {
+    btnTogglePins.addEventListener('click', toggleAllSmartPins);
+  }
+
+  setAdminSection('lotes');
+}
+
+/* ══ LIVE UPDATE ══ */
+function liveUpdate() {
+  const titulo = document.getElementById('f-titulo').value || 'Sin nombre';
+  const area   = document.getElementById('f-dim').value;
+  const uf     = parseFloat(document.getElementById('f-uf').value);
+  const stLbl  = {disponible:'Disponible',vendido:'Vendido',reservado:'Reservado',nodisponible:'No Disponible'}[_estado];
+  const clpRaw = !isNaN(uf) && uf > 0 ? Math.round(uf * _uf) : null;
+
+  document.getElementById('p-pill').className = `ppill ${_estado}`;
+  document.getElementById('p-pill').textContent = stLbl;
+  document.getElementById('p-title').textContent = titulo;
+  document.getElementById('p-area').textContent  = area ? `${area} m²` : '— m²';
+  document.getElementById('p-uf').textContent    = !isNaN(uf)&&uf>0 ? `${uf.toLocaleString('es-CL')} UF` : '— UF';
+  document.getElementById('p-clp').textContent   = clpRaw ? '~ '+fmtCLP(clpRaw) : '—';
+  document.getElementById('f-clp').textContent   = clpRaw ? '~ '+fmtCLP(clpRaw) : '—';
+
+  const desc = document.getElementById('f-caracteristicas') ? document.getElementById('f-caracteristicas').value : '';
+  const descWrap = document.getElementById('p-caracteristicas-wrap');
+  const descDiv = document.getElementById('p-caracteristicas-div');
+  const descTxt = document.getElementById('p-caracteristicas');
+  if (descWrap && descTxt && descDiv) {
+    if (desc.trim()) {
+      descTxt.textContent = desc;
+      descWrap.style.display = 'block';
+      descDiv.style.display = 'block';
+    } else {
+      descWrap.style.display = 'none';
+      descDiv.style.display = 'none';
+    }
+  }
+
+  const fotos = _cid ? _currentFotos() : [];
+  const previewBtn = document.getElementById('p-btn-foto');
+  if (previewBtn) previewBtn.classList.toggle('is-empty', !fotos.length);
+}
+
+/* ══ GUARDAR ══ */
+async function saveLote() {
+  if (!_cid) return;
+  const l = _lotes.find(x => x.id === _cid);
+  if (!l) return;
+  l.titulo      = document.getElementById('f-titulo').value.trim();
+  l.estado      = _estado;
+  l.dimensiones = document.getElementById('f-dim').value.trim();
+  l.valorUF     = document.getElementById('f-uf').value ? parseFloat(document.getElementById('f-uf').value) : null;
+  const descEl  = document.getElementById('f-caracteristicas');
+  if (descEl) {
+    const rawVal = descEl.value.trim();
+    const parsedTags = rawVal
+      ? rawVal.split(/[,;\s]+/).map(t => t.trim()).filter(Boolean).map(t => t.startsWith('#') ? t : `#${t}`)
+      : [];
+    l.caracteristicas = rawVal;
+    l.hashtags = parsedTags;
+  }
+  if (!Array.isArray(l.fotos)) l.fotos = [];
+
+  saveAll();
+
+  renderSidebar();
+  liveUpdate();
+
+  try { localStorage.setItem('ferrari360_lines', JSON.stringify(_lotes)); } catch (e) {}
+
+  if (window.FerrariState) {
+    window.FerrariState.replaceAll(_lotes);
+    if (window.FerrariCamera) window.FerrariCamera.markDirty();
+  }
+}
+
+/* ══ GUARDAR TODO (GLOBAL) ══ */
+async function saveAll() {
+  if (!_sess) {
+    showToast('Inicia sesión para guardar en GitHub', 'error');
+    return;
+  }
+  
+  const btn = document.getElementById('btn-save-all');
+  const txt = document.getElementById('save-all-txt');
+  const oldTxt = txt ? txt.textContent : 'Guardar';
+  
+  if (txt) txt.textContent = 'Guardando…';
+  if (btn) {
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
+  }
+
+  try {
+    const payload = { lotes: _lotes };
+    if (_geo) payload.geo = _geo;
+    const jsonStr = JSON.stringify(payload, null, 2);
+    // GitHub Contents API ~1MB práctico en base64; avisar si se acerca
+    if (jsonStr.length > 900000) {
+      showToast('Advertencia: el JSON es muy grande por las fotos. Considera menos imágenes.', 'info');
+    }
+    const content = btoa(unescape(encodeURIComponent(jsonStr)));
+    const url = `https://api.github.com/repos/${CFG.GITHUB_OWNER}/${CFG.GITHUB_REPO}/contents/${CFG.DATA_PATH}`;
+    const body = { message: `Admin: Guardado global (${_lotes.length} elementos)`, content, branch: CFG.BRANCH };
+    if (_sha) body.sha = _sha;
+    
+    const r = await fetch(url, {
+      method: 'PUT',
+      headers: { Authorization: `token ${_sess.token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Error GitHub'); }
+    const res = await r.json();
+    _sha = res.content.sha;
+    
+    showToast('✓ Lotes guardados en GitHub', 'success');
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    if (txt) txt.textContent = oldTxt;
+    if (btn) {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'all';
+    }
+  }
+}
+
+/* ══ CONFETTI ══ */
+function confetti() {
+  const cols = ['#34C759','#007AFF','#FF9500','#C9A84C','#5E5CE6','#FF3B30','#fff'];
+  const btn  = document.getElementById('btn-save');
+  const rc   = btn.getBoundingClientRect();
+  for (let i = 0; i < 35; i++) {
+    const p = document.createElement('div'); p.className = 'cf';
+    p.style.cssText = `left:${rc.left+rc.width/2+(Math.random()-.5)*220}px;top:${rc.top}px;background:${cols[Math.floor(Math.random()*cols.length)]};width:${4+Math.random()*7}px;height:${4+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.35}s;animation-duration:${.8+Math.random()*.9}s;`;
+    document.body.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+
+/* ══ TOAST ══ */
+let _tt = null;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `toast ${type} show`;
+  clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 3600);
+}
+
+/* ══ ABRIR MODO DIOS (LAYER) ══ */
+function toggleGodLayer() {
+  if (!_sess) {
+    showToast('Inicia sesión primero para abrir el modo arquitecto.', 'error');
+    return;
+  }
+
+  const layer = document.getElementById('god-layer');
+  const frame = document.getElementById('god-frame');
+  if (!layer || !frame) return;
+
+  if (layer.classList.contains('visible')) {
+    layer.classList.remove('visible');
+    frame.src = '';
+  } else {
+    localStorage.setItem('ferrari_github_token',  _sess.token);
+    localStorage.setItem('ferrari_github_owner',  CFG.GITHUB_OWNER);
+    localStorage.setItem('ferrari_github_repo',   CFG.GITHUB_REPO);
+    localStorage.setItem('ferrari_github_branch', CFG.BRANCH);
+
+    // En tablet: forzar tex mid/low vía query para que el iframe no se quede sin WebGL
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 1);
+    const texHint = isTouch ? '&tex=4096' : '';
+    frame.src = 'index.html?mode=god' + texHint;
+    layer.classList.add('visible');
+    const btn = document.getElementById('btn-god-link');
+    if (btn) btn.classList.add('visible');
+  }
+}
+
+/** Gesto tablet: 2 dedos en la franja inferior (~22%) durante 3s → modo arquitecto */
+(function _bindArchitectTwoFingerHold() {
+  let holdTimer = null;
+  let holding = false;
+
+  function clearHold() {
+    holding = false;
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+  }
+
+  function bottomZone(touch) {
+    const h = window.innerHeight || 800;
+    return touch.clientY >= h * 0.78;
+  }
+
+  document.addEventListener('touchstart', function(e) {
+    if (!_sess) return;
+    if (!e.touches || e.touches.length !== 2) { clearHold(); return; }
+    if (!bottomZone(e.touches[0]) || !bottomZone(e.touches[1])) { clearHold(); return; }
+    holding = true;
+    holdTimer = setTimeout(function() {
+      if (!holding || !_sess) return;
+      clearHold();
+      try {
+        if (navigator.vibrate) navigator.vibrate(40);
+      } catch (err) {}
+      showToast('Modo arquitecto', 'success');
+      const layer = document.getElementById('god-layer');
+      if (layer && !layer.classList.contains('visible')) toggleGodLayer();
+      else if (layer && layer.classList.contains('visible')) {
+        /* ya abierto */
+      } else {
+        toggleGodLayer();
+      }
+    }, 3000);
+  }, { passive: true });
+
+  document.addEventListener('touchend', clearHold, { passive: true });
+  document.addEventListener('touchcancel', clearHold, { passive: true });
+  document.addEventListener('touchmove', function(e) {
+    if (!holding || !e.touches || e.touches.length !== 2) { clearHold(); return; }
+    if (!bottomZone(e.touches[0]) || !bottomZone(e.touches[1])) clearHold();
+  }, { passive: true });
+})();
+
+// Escuchar CTRL+ALT+A
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.altKey && (e.key === 'a' || e.key === 'A')) {
+    e.preventDefault();
+    toggleGodLayer();
+  }
+  if (e.key === 'Escape') {
+    const layer = document.getElementById('god-layer');
+    if (layer && layer.classList.contains('visible')) {
+      toggleGodLayer();
+    }
+  }
+});
+
+/* ══ LOGOUT ══ */
+function doLogout() {
+  _sess=null; _lotes=[]; _cid=null; _sha=null; _godActive=false;
+
+  localStorage.removeItem('ferrari_github_token');
+  localStorage.removeItem('ferrari_github_owner');
+  localStorage.removeItem('ferrari_github_repo');
+  localStorage.removeItem('ferrari_github_branch');
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').classList.remove('hidden');
+  ['li-user', 'li-repo', 'li-pat', 'li-godpass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const godToggle = document.getElementById('god-toggle');
+  if (godToggle) godToggle.classList.remove('active');
+  const godCheck = document.getElementById('god-check');
+  if (godCheck) godCheck.textContent='☆';
+  const godPass = document.getElementById('god-pass-group');
+  if (godPass) godPass.classList.remove('visible');
+  const godLink = document.getElementById('btn-god-link');
+  if (godLink) godLink.classList.remove('visible');
+  const edForm = document.getElementById('ed-form');
+  if (edForm) edForm.style.display='none';
+  const edPh = document.getElementById('ed-placeholder');
+  if (edPh) edPh.style.display='';
+  const layer = document.getElementById('god-layer');
+  const frame = document.getElementById('god-frame');
+  if (layer) layer.classList.remove('visible');
+  if (frame) frame.src = '';
+}
+
+/* ══ ENTER KEY ══ */
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')) doLogin();
+});
+</script>
+<div id="god-layer">
+  <div id="btn-close-god" onclick="toggleGodLayer()" title="Cerrar Modo Dios">✕</div>
+  <iframe id="god-frame" src=""></iframe>
+</div>
+
+<script src="js/ui/f-gallery.js"></script>
+
+<script>
+  // ══ TUTORIAL INTERACTIVO ══
+  const TutorialSystem = (function() {
+    const steps = [
+      {
+        el: '#brand-card',
+        title: 'Paso 1: Identidad del Proyecto',
+        text: 'Aquí personalizas el nombre del proyecto, logo PNG, banner de título y estilo visual del dock.',
+        pos: 'left'
+      },
+      {
+        el: '[data-section="contacto"]',
+        title: 'Paso 2: Contacto y Alertas WhatsApp',
+        text: 'Aquí defines el WhatsApp de ventas para tus clientes y el correo de FormSubmit. También puedes activar las Alertas por WhatsApp de CallMeBot para recibir avisos de compras al instante.',
+        pos: 'left'
+      },
+      {
+        el: '.sidebar',
+        title: 'Paso 3: Lista de Lotes',
+        text: 'Visualiza la base de datos de todas tus parcelas. Selecciona un lote de la lista para editar sus precios, estado o arrastrar fotos directamente.',
+        pos: 'right'
+      },
+      {
+        el: '.editor',
+        title: 'Paso 4: Área de Edición de Lotes',
+        text: 'Modifica detalles individuales del lote seleccionado (precio UF, superficie m², tags de características) y añade galerías de fotos que verá el comprador.',
+        pos: 'left'
+      },
+      {
+        el: '#btn-save-all',
+        title: 'Paso 5: Guardar y Publicar en GitHub',
+        text: '¡Crítico! Después de realizar cualquier cambio en los lotes o configuraciones, presiona este botón para que todo suba a la nube y los clientes lo vean en la web pública.',
+        pos: 'bottom'
+      },
+      {
+        el: '#btn-god-link',
+        title: 'Paso 6: Modo Dios (Dibujo y Pines)',
+        text: 'Accede a la herramienta visual avanzada para trazar nuevos polígonos de lotes o mover de posición física los Smart Pins sobre la foto 360°.',
+        pos: 'bottom'
+      },
+      {
+        el: null, // Centrado
+        title: '¡Todo listo!',
+        text: 'Ya conoces todas las secciones. Selecciona un lote de la lista o navega por los tabs para configurar tu proyecto a medida.',
+        pos: 'center'
+      }
+    ];
+
+    let currentStep = 0;
+    const overlay = document.getElementById('tutorial-overlay');
+    const bubble = document.getElementById('tutorial-bubble');
+    const tTitle = document.getElementById('t-title');
+    const tText = document.getElementById('t-text');
+    const tStep = document.getElementById('t-step');
+    const tNext = document.getElementById('t-next');
+
+    let activeHighlight = null;
+
+    function start() {
+      if (!document.getElementById('login-screen').classList.contains('hidden')) {
+        alert("Inicia sesión primero para ver el tutorial.");
+        return;
+      }
+      currentStep = 0;
+      overlay.style.display = 'block';
+      bubble.style.display = 'block';
+      setTimeout(() => {
+        overlay.style.opacity = '1';
+        showStep();
+      }, 10);
+    }
+
+    function end() {
+      overlay.style.opacity = '0';
+      bubble.style.opacity = '0';
+      if (activeHighlight) {
+        activeHighlight.classList.remove('tutorial-highlight');
+      }
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        bubble.style.display = 'none';
+      }, 300);
+    }
+
+    function showStep() {
+      if (activeHighlight) {
+        activeHighlight.classList.remove('tutorial-highlight');
+      }
+
+      const step = steps[currentStep];
+      tTitle.textContent = step.title;
+      tText.textContent = step.text;
+      tStep.textContent = `${currentStep + 1} / ${steps.length}`;
+      tNext.textContent = (currentStep === steps.length - 1) ? 'Finalizar' : 'Siguiente';
+
+      if (step.el) {
+        const el = document.querySelector(step.el);
+        if (el) {
+          activeHighlight = el;
+          el.classList.add('tutorial-highlight');
+          
+          const rect = el.getBoundingClientRect();
+          positionBubble(rect, step.pos);
+        } else {
+          centerBubble();
+        }
+      } else {
+        centerBubble();
+      }
+      
+      bubble.style.opacity = '1';
+      bubble.style.transform = 'translateY(0)';
+    }
+
+    function centerBubble() {
+      bubble.style.left = `calc(50vw - ${bubble.offsetWidth/2}px)`;
+      bubble.style.top = `calc(50vh - ${bubble.offsetHeight/2}px)`;
+    }
+
+    function positionBubble(rect, pos) {
+      let top, left;
+      const bW = 280;
+      const bH = bubble.offsetHeight || 150;
+      const gap = 15;
+
+      // Móvil override
+      if (window.innerWidth <= 900) {
+        centerBubble();
+        return;
+      }
+
+      if (pos === 'right') {
+        top = rect.top + (rect.height/2) - (bH/2);
+        left = rect.right + gap;
+      } else if (pos === 'left') {
+        top = rect.top + (rect.height/2) - (bH/2);
+        left = rect.left - bW - gap;
+      } else if (pos === 'bottom') {
+        top = rect.bottom + gap;
+        left = rect.left + (rect.width/2) - (bW/2);
+      }
+
+      // Boundaries
+      if (left < 10) left = 10;
+      if (left + bW > window.innerWidth - 10) left = window.innerWidth - bW - 10;
+      if (top < 10) top = 10;
+      if (top + bH > window.innerHeight - 10) top = window.innerHeight - bH - 10;
+
+      bubble.style.top = `${top}px`;
+      bubble.style.left = `${left}px`;
+    }
+
+    function next() {
+      currentStep++;
+      if (currentStep >= steps.length) {
+        end();
+      } else {
+        bubble.style.opacity = '0';
+        bubble.style.transform = 'translateY(10px)';
+        setTimeout(showStep, 200);
+      }
+    }
+
+    return { start, next, end };
+  })();
+</script>
+</body>
+</html>

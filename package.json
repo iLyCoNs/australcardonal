@@ -1,0 +1,27 @@
+{
+  "name": "kimi-kpranokiller",
+  "version": "1.0.0",
+  "description": "Pannellum is a lightweight, free, and open source panorama viewer for the web. Built using HTML5, CSS3, JavaScript, and WebGL, it is plug-in free. It can be deployed easily as a single file, just 21kB gzipped, and then embedded into pages as an `<iframe>`. A configuration utility is included to generate the required code for embedding. An API is included for more advanced integrations.",
+  "main": "config.js",
+  "scripts": {
+    "tts": "node tools/tts-proxy.js",
+    "voice": "node tools/tts-proxy.js",
+    "tourism-videos": "node tools/find-tourism-videos.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iLyCoNs/AUSTRAL360.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/iLyCoNs/AUSTRAL360/issues"
+  },
+  "homepage": "https://github.com/iLyCoNs/AUSTRAL360#readme",
+  "dependencies": {
+    "edge-tts-universal": "^1.4.0"
+  }
+}

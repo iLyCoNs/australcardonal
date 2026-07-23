@@ -1,0 +1,15 @@
+{
+  "plan": "basic",
+  "version": 1,
+  "label": "PLAN BÁSICO",
+  "features": {
+    "aiCopilot": false,
+    "tourSpeech": false,
+    "financeCalc": true,
+    "tourismCatalog": true,
+    "weatherWidget": true,
+    "osmNearby": true,
+    "draggableWidgets": true,
+    "adminCopilotSection": false
+  }
+}
