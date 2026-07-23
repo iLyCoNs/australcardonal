@@ -1,12 +1,12 @@
 {
   "version": 3,
-  "projectName": "NUEVO PROYECTO 360°",
+  "projectName": "Terreno Urbano de 5.000 m² en Sector de Cardonal",
   "logoPath": null,
   "logoId": null,
   "logos": [],
-  "titleBannerPath": null,
-  "titleBannerHref": null,
-  "titleBannerScale": 100,
+  "titleBannerPath": "assets/brand/banners/title_mrx5fb37.png",
+  "titleBannerHref": "https://www.terragestion.cl/",
+  "titleBannerScale": 200,
   "font": "cormorant",
   "dockStyle": "crystal",
   "mobileSolid": true,
@@ -26,5 +26,5 @@
     "waAlertsPhone": "",
     "waAlertsKey": ""
   },
-  "updatedAt": 1784787934185
+  "updatedAt": 1784789229283
 }
